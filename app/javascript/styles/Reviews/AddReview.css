@@ -1,0 +1,53 @@
+.add-review .header{
+    background: white;
+    padding: 25px 40px;
+    font-family: HelveticaNeue;
+    border-radius: 5px;
+}
+.add-review .form{
+    background: white;
+    padding: 10px 20px;
+}
+.add-review .form label{
+    opacity: 0.8;
+    font: 16px Rubik;
+}
+.w50{
+    width: 50%;
+}
+.add-review .form-group{
+    margin: 10px 0px;
+}
+.add-review .form-control{
+    background: rgb(248,248,248);
+}
+.flex{
+    display: flex;
+    align-items: center;
+}
+.just-cent{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.add-review .footer{
+    position: fixed;
+    /*margin-left: 0;*/
+    left: 0;
+    background: white;
+    bottom: 0;
+    width: 100%;
+    padding: 20px 60px;
+    overflow: hidden;
+    z-index: 0;
+    box-shadow: 8px 8px 8px 8px rgba(0, 0, 0, 0.3), 0 6px 20px 0 rgba(0, 0, 0, 0.2);
+}
+.add-review .footer button{
+    float: right;
+    padding: 10px 30px;
+    border-radius: 5px;
+    border: 0;
+    background: #DD356E;
+    color: white;
+    font:16px Rubik;
+}

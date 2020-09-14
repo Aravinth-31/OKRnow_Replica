@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  rname: MyString
+  tpfrom: MyString
+  tpto: MyString
+  krd: MyString
+  perchk: false
+
+two:
+  rname: MyString
+  tpfrom: MyString
+  tpto: MyString
+  krd: MyString
+  perchk: false

@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  dname: MyString
+  dhod: MyString
+  dfrom: MyString
+  dto: MyString
+
+two:
+  dname: MyString
+  dhod: MyString
+  dfrom: MyString
+  dto: MyString

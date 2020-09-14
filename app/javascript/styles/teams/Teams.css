@@ -1,0 +1,128 @@
+.row.thead{
+    padding: 2% 5%;
+    background: white;
+    display: flex;
+    border-radius: 5px;
+    align-items: center;
+}
+.row.thead h3.title{
+    font: 25px HelveticaNeue;	
+}
+.row.thead .add-field{
+    display: flex;
+    justify-content: flex-end;
+}
+.row.thead .add{
+    border: 0;
+    background: #DD356E;
+    padding: 10px 20px;
+    color: white;
+    border-radius: 5px;
+    font: 14px HelveticaNeue;
+}
+.teams-header{
+    background: #f4f6fe;
+    padding:20px 70px;
+    font:14px Rubik;
+}
+.teams-header .title{
+    opacity: 0.5;
+}
+.tcontents{
+    padding:5px 10px;
+    background: white;
+    margin: 0;
+
+}
+.teams-content{
+    font: 17px Rubik;
+    background: white;
+    padding: 25px 40px;
+    opacity: 0.9;
+    margin: 0px 10px;
+    border-radius: 5px;
+}
+.teams-content:hover{
+    background: #f9ecf2;
+    border: 1px solid #DD356E;
+}
+.teams-header .col{
+    display: flex;
+}
+.teams-header .col .arrows{
+    display: block;
+    height: 100%;
+    margin-top: 0px;
+    font:15px Rubik;
+}
+.teams-header .col .arrows .up:hover{
+    opacity: 1;
+}
+.teams-header .col .arrows .up{
+    margin-left: 4px;
+    cursor: pointer;
+    margin-top: -1px;
+    padding-bottom: 3px;
+    opacity: 0.5;
+}
+.teams-header .col .arrows .down:hover{
+    opacity: 1;
+}
+.teams-header .col .arrows .down{
+    margin-left:4px;
+    margin-top:-21px;
+    opacity: 0.5;
+    cursor: pointer;
+}
+ .teams-content .edit{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    opacity: 0.6;
+    cursor: pointer;
+}
+.teams-content .delete{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    opacity: 0.6;
+    cursor: pointer;
+}
+.pages{
+    float: left;
+}
+.pages button{
+    border: 1px solid #bfbfbf;
+    margin: 0;
+    width: 35px;
+    font-size: 12px;
+    opacity: 0.8;
+    height: 35px;
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;	
+}
+.goto{
+    float: right;
+    color: #333333;
+    font:18px Rubik;
+    display: flex;
+    align-items: center;
+}
+.goto input{
+    width: 50px;
+    margin: 5px;
+    border: 0;
+    border-radius: 5px;
+    padding: 5px;
+}
+.teamFuns{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background: #f4f6fe;
+    align-items: center;
+    opacity: 0.7;
+    background: #f4f6fe;
+    font: 16px Rubik;
+}

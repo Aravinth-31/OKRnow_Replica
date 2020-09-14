@@ -1,0 +1,65 @@
+.form1{
+    display: flex;
+    position: absolute;
+    width: 65%;
+    padding: 50px;
+    margin-top: 30px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.container{
+    display: flex;
+    justify-content: center;
+}
+.form1 h2{
+    opacity: 0.8;
+}
+.form1 h5{
+    opacity: 0.5;
+    font-size: large;
+}
+.form1 input{
+    width: 320px;
+    background: rgba(224, 231, 255, 0.2);
+    padding: 18px 12px;
+    height: 42px;
+}
+.form1 button{
+    width: 320px;
+    color: white;
+    background: #DD346E;
+    padding: 10px;
+    height: 43px;
+}
+.forgot-section{
+    color: #B0BAC9;
+    font:15px Rubik;
+    margin-left:200px;
+}
+.login-img{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login-form{
+    width: 50%;
+}
+.error{
+    color:red;
+    font-size: smaller;
+}
+.input-icons i{
+    position: absolute;
+}
+.input-icons{
+    width: 100%;
+    margin-bottom: 10px;
+}
+.eye{
+    /* position: absolute; */
+    /* left: 340px; */
+    /* top:318px; */
+    cursor: pointer;
+    padding:10px;
+    min-width: 40px;
+    margin-left: 280px;
+}

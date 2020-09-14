@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  ecode: MyString
+  ename: MyString
+  edept: MyString
+  edesg: MyString
+  ereptmngr: MyString
+  eband: MyString
+  eloc: MyString
+
+two:
+  ecode: MyString
+  ename: MyString
+  edept: MyString
+  edesg: MyString
+  ereptmngr: MyString
+  eband: MyString
+  eloc: MyString

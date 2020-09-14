@@ -1,0 +1,103 @@
+.Functions div.head{
+    background: white;
+    border-radius: 5px;
+}
+.Functions .row.head{
+    padding: 5px;
+    border-radius: 5px;
+}
+.Functions .head .col{
+    display: flex;
+    align-items: center;
+    height: 80px;
+}
+.Functions .head .title{
+    font: 18px HelveticaNeue;	
+    font-weight: bold;
+    padding-left: 5%;
+}
+.Functions .head .col button.addfun{
+    background: #DD356E;
+    border: 1px solid #DD356E;
+    color: white;
+    padding:10px;
+    border-radius: 5px;
+    margin-right: 10%;
+    width: 250px;
+    font-size: 14px;
+}
+.Functions .pages{
+    float: left;
+}
+.Functions .pages button{
+    border: 1px solid #bfbfbf;
+    margin: 0;
+    width: 35px;
+    font-size: 12px;
+    opacity: 0.8;
+    height: 35px;
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;	
+}
+.Functions .goto{
+    float: right;
+    color: #333333;
+    font:18px Rubik;
+    display: flex;
+    align-items: center;
+}
+.Functions .goto input{
+    width: 50px;
+    margin: 5px;
+    border: 0;
+    border-radius: 5px;
+    padding: 5px;
+}
+.Functions .header{
+    padding: 2%;
+    padding-left: 8%;
+}
+.Functions .content{
+    background: white;
+    /* padding: 1% 4%; */
+}
+.Functions .content .row{
+    margin: 1% 4%;
+    padding-left: 3%;
+    padding: 2%;
+}
+.Functions .content .row .edit{
+    display: flex;
+    justify-content: flex-end;
+}
+.Functions .content .row .col{
+    display: flex;
+    align-items: center;
+}
+.Functions .content .row:hover{
+    background: #f9ecf2;
+    border-radius: 5px;
+    border: 1px solid #DD356E;
+}
+.Functions .Edit,.delete{
+    opacity: 0.4;
+    font-size: 18px;
+    cursor: pointer;
+}
+.Functions .Edit:hover{
+    opacity: 1;
+}
+.Functions .delete:hover{
+    opacity: 1;
+}
+.Functions .emptyFuns{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background: #f4f6fe;
+    align-items: center;
+    opacity: 0.7;
+    background: #f4f6fe;
+    font: 16px Rubik;
+}

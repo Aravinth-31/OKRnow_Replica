@@ -1,0 +1,29 @@
+.child .input input{
+    border-color: rgb(218,218,218);
+}
+.child .input button.addBand{
+    background: white;
+    border:1px solid #DD356E;
+    color: #DD356E;
+}
+.child .output ul{
+    list-style-type: none;
+}
+.child .output ul li{
+    border: 1px solid #DD356E;
+    min-width:50px;
+    padding:5px 10px;
+    border-radius: 20px;
+    margin-right:20px;
+    padding: 5px 10px 5px 20px;
+    color: #DD356E
+}
+.child .output ul .closer{
+    float: right;
+    background: #DD356E;
+    color: white;
+    border-radius: 50%;
+    padding:2px 5px;
+    font-size: 12px;
+    cursor: pointer;
+}

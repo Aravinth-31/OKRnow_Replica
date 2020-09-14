@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  tname: MyString
+  tdept: MyString
+  treptmngr: MyString
+  tfrom: MyString
+  tto: MyString
+  tusers: MyString
+
+two:
+  tname: MyString
+  tdept: MyString
+  treptmngr: MyString
+  tfrom: MyString
+  tto: MyString
+  tusers: MyString

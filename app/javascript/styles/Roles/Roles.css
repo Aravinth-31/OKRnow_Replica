@@ -1,0 +1,93 @@
+.roles .header{
+    background: white;
+    padding: 1.5% 5%;
+    display: flex;
+    border-radius: 5px;
+    align-items: center;
+}
+.roles .header h3{
+    font: 25px HelveticaNeue;
+    font-weight: bolder;
+}
+.roles .header button{
+    border: 0;
+    background: #DD356E;
+    color: white;
+    border-radius: 5px;
+    padding: 8px 20px;
+}
+.roles .roles-header{
+    background: #f4f6fe;
+    padding: 10px 40px;
+}
+.roles .roles-header .title{
+    opacity: 0.5;
+    font: 14px Rubik;
+}
+.roles .cover{
+    background: white;
+    padding: 5px 15px;
+}
+.roles .roles-content{
+    background: white;
+    margin: 0;
+    padding: 15px 20px;
+    border-radius: 5px;
+    opacity: 0.9;
+}
+.roles .roles-content:hover{
+    background: #f9ecf2;	
+    border: 1px solid #DD356E;
+}
+.roles .roles-content .edit{
+    opacity: 0.6;
+    cursor: pointer;
+}
+.roles .roles-content .edit:hover{
+    opacity: 1;
+}
+.roles .roles-content .delete{
+    opacity: 0.6;
+    cursor: pointer;			
+}
+.roles .roles-content .delete:hover{
+    opacity: 1;
+}
+.roles .pages{
+    float: left;
+}
+.roles .pages button{
+    border: 1px solid #bfbfbf;
+    margin: 0;
+    width: 35px;
+    font-size: 12px;
+    opacity: 0.8;
+    height: 35px;
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;	
+}
+.roles .goto{
+    float: right;
+    color: #333333;
+    font:18px Rubik;
+    display: flex;
+    align-items: center;
+}
+.roles .goto input{
+    width: 50px;
+    margin: 5px;
+    border: 0;
+    border-radius: 5px;
+    padding: 5px;
+}
+.roles .emptyRoles{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background: #f4f6fe;
+    align-items: center;
+    opacity: 0.7;
+    background: #f4f6fe;
+    font: 16px Rubik;
+}
