@@ -43,6 +43,8 @@ class AddFunc extends React.Component {
                         val.map((v, i) => {
                             val[i] = JSON.parse(v);
                         });
+                        if(val.length==0)
+                            val=[{name:'',from:'',to:''}];
                         This.setState({ [key]: val });
                     }
                     else

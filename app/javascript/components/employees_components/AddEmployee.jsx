@@ -4,11 +4,13 @@ import $ from 'jquery';
 import { Redirect } from 'react-router-dom';
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { } from 'react-router-dom'
 
 class AddEmployee extends React.Component {
     added = false;
     update = false;
+    dept=[];
+    teams=[];
+    masterData={band:[],costCent:[],desg:[],loc:[]}
     constructor(props) {
         super(props);
         this.state = {
@@ -32,6 +34,9 @@ class AddEmployee extends React.Component {
         };
     }
     componentDidMount() {
+        this.getDepts();
+        this.getTeams();
+        this.getMasterData();
         const This = this;
         $(document).ready(function () {
             var now = new Date();
@@ -41,6 +46,7 @@ class AddEmployee extends React.Component {
             This.setState({ edoj: today });
             $('#datePicker').val(today);
             $('#date-from').val(today);
+
             if (This.props.location.state) {
                 This.update = true;
                 const emp = This.props.location.state.employee;
@@ -51,8 +57,12 @@ class AddEmployee extends React.Component {
                         val.map((v, i) => {
                             val[i] = JSON.parse(v);
                         });
+                        if(val.length==0)
+                            val=[{name:'',from:'',to:''}];
                         This.setState({ [key]: val });
                     }
+                    if(key=='eteam')
+                        This.setState({oldteam:emp[key],[key]: emp[key]});
                     else
                         This.setState({ [key]: emp[key] });
                 })
@@ -64,13 +74,58 @@ class AddEmployee extends React.Component {
             })
         })
     }
+    getDepts=()=>{
+        const url = "/api/v1/departments/index";
+        fetch(url)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error("Network response was not ok.");
+            })
+            .then(response => {
+                this.dept=response;
+                this.forceUpdate();
+            })
+            .catch((err) => console.log(err));
+    }
+    getTeams=()=>{
+        const url = "/api/v1/teams/index";
+        fetch(url)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error("Network response was not ok.");
+            })
+            .then(response => {
+                this.teams=response;
+                this.forceUpdate();
+            })
+            .catch((err) => console.log(err));
+    }
+    getMasterData=()=>{
+        const url = "/api/v1/masterdata/index";
+        fetch(url)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error("Network response was not ok.");
+            })
+            .then(response => {
+                this.masterData=response
+                console.log(this.masterData)
+                this.forceUpdate();
+            })
+            .catch((err) => console.log(err));
+    }
     onChngeHandler = (e) => {
         e.preventDefault();
         this.setState({ [e.target.name]: e.target.value });
     }
     add = (e) => {
         e.preventDefault();
-        console.log(this.state);
         let emn = [];
         this.state.rmngr.map((val, index) => {
             emn.push(val)
@@ -78,8 +133,9 @@ class AddEmployee extends React.Component {
         emn.map((val, index) => {
             emn[index] = JSON.stringify(val)
         })
+        if(this.state.eteam!=this.state.oldteam)
+            this.teamUpdate()
         this.setState({ epassword: this.state.ename }, function () {
-            console.log(this.state);
             if (this.update) {
                 const url = "/api/v1/employees/update";
                 const body = this.state;
@@ -127,13 +183,17 @@ class AddEmployee extends React.Component {
                     })
                     .then(response => {
                         console.log(response);
-                        this.added = true;
+                        if(response.id)
+                            this.added = true;
+                        else
+                            this.setState({edept: '',ename: '',epassword: '',edesg: '',eband: '',erole: '',ecode: '',eemail: '',emno: '',edoj: '',easal: '',evpay: '',eloc: '',ezone: '',ecost: '',eteam: '',rmngr: [{ name: '', from: '', to: '' }]},()=>this.forceUpdate())
                         this.forceUpdate();
                     })
                     .catch(error => console.log(error.message));
             }
         });
     }
+
     managerHandler = (e, i) => {
         const mng = this.state.rmngr;
         var m = mng[i];
@@ -150,8 +210,32 @@ class AddEmployee extends React.Component {
         var mng = []
         this.state.rmngr.map((val, i) => mng.push(val));
         mng.splice(i, 1)
-        console.log(mng)
         this.setState({ rmngr: mng }, () => this.forceUpdate());
+    }
+
+    teamUpdate=()=>{
+        const url = "/api/v1/teams/updateByEmp";
+        const {eteam,ename,oldteam}=this.state
+        const body = {tname:eteam,user:ename,oldTeam:oldteam}
+        const token = document.querySelector('meta[name="csrf-token"]').content;
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "X-CSRF-Token": token,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error("Network response was not ok.");
+            })
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => console.log(error.message));
     }
     render() {
         if (this.added)
@@ -168,8 +252,9 @@ class AddEmployee extends React.Component {
                             <label>Department</label>
                             <select className="form-control" value={this.state.edept} name="edept" onChange={this.onChngeHandler}>
                                 <option disabled value=''></option>
-                                <option className="form-control" value='Back-end'>Back-end</option>
-                                <option className="form-control" value="Front-end">Front-end</option>
+                                {this.dept.map((val,i)=>{
+                                    return <option className="form-control" value={val.dname} key={i}>{val.dname}</option>
+                                })}
                             </select>
                         </div>
                         <div className="form-group">
@@ -180,23 +265,18 @@ class AddEmployee extends React.Component {
                             <label>Designation</label>
                             <select className="form-control" value={this.state.edesg} name="edesg" onChange={this.onChngeHandler}>
                                 <option disabled value=''></option>
-                                <option className="form-control" value='Associate Developer'>Associate Developer</option>
-                                <option className="form-control" value='CEO'>CEO</option>
-                                <option className="form-control" value='CTO'>CTO</option>
-                                <option className="form-control" value='Product Designer'>Product Designer</option>
-                                <option className="form-control" value='Senior Developer'>Senior Developer</option>
-                                <option className="form-control" value='Tester'>Tester</option>
-                                <option className="form-control" value='Trainee'>Trainee</option>
+                                {this.masterData.desg.map((val,i)=>{
+                                    return <option className="form-control" key={i} value={val}>{val}</option>
+                                })}
                             </select>
                         </div>
                         <div className="form-group">
                             <label>Band</label>
                             <select className="form-control" value={this.state.eband} name="eband" onChange={this.onChngeHandler}>
                                 <option disabled value=''></option>
-                                <option className="form-control" value='L1'>L1</option>
-                                <option className="form-control" value='L2'>L2</option>
-                                <option className="form-control" value='L3'>L3</option>
-                                <option className="form-control" value='L4'>L4</option>
+                                {this.masterData.band.map((val,i)=>{
+                                    return <option className="form-control" key={i} value={val}>{val}</option>
+                                })}
                             </select>
                         </div>
                         <div className="form-group">
@@ -234,12 +314,9 @@ class AddEmployee extends React.Component {
                             <label>Location</label>
                             <select className="form-control" value={this.state.eloc} name="eloc" onChange={this.onChngeHandler}>
                                 <option disabled value=''></option>
-                                <option className="form-control" value='Bangalore'>Bangalore</option>
-                                <option className="form-control" value='Chennai'>Chennai</option>
-                                <option className="form-control" value='Delhi'>Delhi</option>
-                                <option className="form-control" value='Hyderabad'>Hyderabad</option>
-                                <option className="form-control" value='Kolkata'>Kolkata</option>
-                                <option className="form-control" value='Mumbai'>Mumbai</option>
+                                {this.masterData.loc.map((val,i)=>{
+                                    return <option className="form-control" key={i} value={val}>{val}</option>
+                                })}
                             </select>
                         </div>
                         <div className="form-group">
@@ -253,15 +330,21 @@ class AddEmployee extends React.Component {
                             <label>Cost Center</label>
                             <select className="form-control" value={this.state.ecost} name="ecost" onChange={this.onChngeHandler}>
                                 <option className="form-control" disabled value=''></option>
-                                <option className="form-control" value='Bangalore'>Bangalore</option>
-                                <option className="form-control" value='Chennai'>Chennai</option>
+                                {this.masterData.costCent.map((val,i)=>{
+                                    return <option className="form-control" value={val} key={i}>{val}</option>
+                                })}
                             </select>
                         </div>
                         <div className="form-group">
                             <label>Team</label>
                             <select className="form-control" value={this.state.eteam} name="eteam" onChange={this.onChngeHandler}>
                                 <option value="" disabled></option>
-                                <option className="form-control" disabled>No options</option>
+                                {this.teams.map((team,i)=>{
+                                    return <option className="form-control" value={team.tname} key={i}>{team.tname}</option>
+                                })}
+                                {this.teams.length==0?
+                                    <option className="form-control" disabled>No options</option>:null
+                                }
                             </select>
                         </div>
                     </div>

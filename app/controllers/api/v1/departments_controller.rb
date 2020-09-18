@@ -5,7 +5,10 @@ class Api::V1::DepartmentsController < ApplicationController
   end
 
   def create
-    department=Department.create(dname:params[:dname],rmngr:params[:rmngr])
+    department=Department.find_by(dname:params[:dname])
+    if(!department)
+      department=Department.create!(dname:params[:dname],rmngr:params[:rmngr])
+    end
     if department
       render json:department
     else

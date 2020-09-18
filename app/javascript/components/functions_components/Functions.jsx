@@ -16,12 +16,15 @@ class Functions extends React.Component {
         };
     }
     componentDidMount() {
+        this.getData();
         $(document).ready(function () {
             $('[data-toggle="tooltip"]').tooltip();
             $('.Title').prop('title', 'Hi');
             $('.Title').prop('data-toggle', 'tooltip');
             $('.Title').prop('data-placement', 'top');
         });
+    }
+    getData=()=>{
         const url = "/api/v1/functions/index";
         fetch(url)
             .then(response => {
@@ -57,7 +60,7 @@ class Functions extends React.Component {
             })
             .then(response => {
                 console.log(response);
-                window.location.reload();
+                this.getData();
             })
             .catch(error => console.log(error.message));
     }

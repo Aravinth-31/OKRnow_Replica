@@ -44,6 +44,7 @@ Rails.application.routes.draw do
       get 'teams/index'
       post 'teams/create'
       post 'teams/update'
+      post 'teams/updateByEmp'
       post 'teams/destroy'
     end
   end

@@ -5,7 +5,10 @@ class Api::V1::FunctionsController < ApplicationController
   end
 
   def create
-    function=Function.create(fname:params[:fname],rmngr:params[:rmngr])
+    function=Function.find_by(fname:params[:fname])
+    if(!function)
+      function=Function.create(fname:params[:fname],rmngr:params[:rmngr])
+    end
     if function
       render json:function
     else

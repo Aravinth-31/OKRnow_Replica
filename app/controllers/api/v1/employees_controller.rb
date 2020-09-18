@@ -6,7 +6,7 @@ class Api::V1::EmployeesController < ApplicationController
 
   def create
     employee=Employee.create(ecode:params[:ecode],ename:params[:ename],edept:params[:edept],edesg:params[:edesg],eband:params[:eband],eloc:params[:eloc],erole:params[:erole], eemail:params[:eemail], emno:params[:emno], edoj:params[:edoj], easal:params[:easal], evpay:params[:evpay], ezone:params[:ezone], ecost:params[:ecost], eteam:params[:eteam],epassword:params[:epassword],rmngr:params[:rmngr])
-    if employee
+    if employee[:id]
       render json:employee
     else
       render json:employee.errors

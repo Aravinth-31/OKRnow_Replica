@@ -13,6 +13,9 @@ class Teams extends React.Component {
         };
     }
     componentDidMount() {
+        this.getData();
+    }
+    getData=()=>{
         const url = "/api/v1/teams/index";
         fetch(url)
             .then(response => {
@@ -49,7 +52,7 @@ class Teams extends React.Component {
             })
             .then(response => {
                 console.log(response);
-                window.location.reload();
+                this.getData();
             })
             .catch(error => console.log(error.message));
     }

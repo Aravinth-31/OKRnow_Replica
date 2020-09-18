@@ -13,6 +13,9 @@ class Roles extends React.Component {
         };
     }
     componentDidMount() {
+        this.getData();
+    }
+    getData = () => {
         const url = "/api/v1/all_roles/allRoles";
         fetch(url)
             .then(response => {
@@ -22,14 +25,7 @@ class Roles extends React.Component {
                 throw new Error("Network response was not ok.");
             })
             .then(response => {
-                // const Roles = []
-                // var str1;
-                // response.map((role, index) => {
-                //     let str1 = role.rperms
-                //     str1 = str1.slice(0, str1.length);
-                //     Roles.push({ id: role.id, rname: role.rname, permits: JSON.parse(str1), rusers: role.rusers });
-                // })
-                this.setState({ roles: response})
+                this.setState({ roles: response })
                 console.log(this.state.roles);
                 this.forceUpdate();
             })
@@ -55,7 +51,7 @@ class Roles extends React.Component {
             })
             .then(response => {
                 console.log(response);
-                window.location.reload();
+                this.getData();
             })
             .catch(error => console.log(error.message));
     }
@@ -93,11 +89,11 @@ class Roles extends React.Component {
                                     </div>
                                 </div>
                             );
-                        }) : 
+                        }) :
                         <div className="emptyRoles">
-                                <img src="http://159.65.156.91/static/media/page-empty.89ace62a.svg" alt="" />
-                                <h5>No Data Found</h5>
-                            </div>
+                            <img src="http://159.65.156.91/static/media/page-empty.89ace62a.svg" alt="" />
+                            <h5>No Data Found</h5>
+                        </div>
                     }
                     <br /><br /><br />
                     {this.state.roles.length > 0 ?

@@ -3,16 +3,33 @@ class Api::V1::TeamsController < ApplicationController
     teams = Team.all.order(created_at: :asc)
     render json:teams
   end
-
   def create
-    team=Team.create(tname:params[:tname],tdept:params[:tdept],tusers:params[:tusers],rmngr:params[:rmngr])
+    team=Team.find_by(tname:params[:tname])
+    if(!team)
+      team=Team.create(tname:params[:tname],tdept:params[:tdept],tusers:params[:tusers],rmngr:params[:rmngr])
+    else
+      team.tusers << params[:user]
+      team.save()
+    end
     if team
       render json:team
     else
       render json:team.errors
     end
   end
-
+  def updateByEmp
+    team=Team.find_by(tname:params[:tname])
+    if(team)
+      team.tusers << params[:user]
+      team.save()
+    end
+    team=Team.find_by(tname:params[:oldTeam])
+    if(team)
+      team.tusers.delete(params[:user]);
+      team.save()
+    end
+    render json:{message:'Success'}
+  end
   def update
     id=params[:id]
     puts id
@@ -27,7 +44,6 @@ class Api::V1::TeamsController < ApplicationController
       render json:team.errors
     end    
   end
-
   def destroy
     id=params[:id]
     team=Team.where(:id => id).destroy_all()

@@ -89,7 +89,8 @@ class ResetPassword extends React.Component {
             })
             .then(response => {
                 console.log(response);
-                toast.success("Password Updated", { position: toast.POSITION.TOP_CENTER,closeButton:false,autoClose:2000 })
+                toast.success("Password Updated", { position: toast.POSITION.TOP_CENTER,closeButton:false,autoClose:2000 });
+                setTimeout(()=>window.location.reload(),1500);
             })
             .catch(error => console.log(error.message));
     }
