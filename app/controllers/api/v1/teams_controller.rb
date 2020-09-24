@@ -8,8 +8,10 @@ class Api::V1::TeamsController < ApplicationController
     if(!team)
       team=Team.create(tname:params[:tname],tdept:params[:tdept],tusers:params[:tusers],rmngr:params[:rmngr])
     else
-      team.tusers << params[:user]
-      team.save()
+      if(!team.tusers.include?params[:user])
+        team.tusers << params[:user]
+        team.save()
+      end
     end
     if team
       render json:team
@@ -20,8 +22,10 @@ class Api::V1::TeamsController < ApplicationController
   def updateByEmp
     team=Team.find_by(tname:params[:tname])
     if(team)
-      team.tusers << params[:user]
-      team.save()
+      if(!team.tusers.include?params[:user])
+        team.tusers << params[:user]
+        team.save()
+      end
     end
     team=Team.find_by(tname:params[:oldTeam])
     if(team)

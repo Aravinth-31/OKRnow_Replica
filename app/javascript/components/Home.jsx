@@ -1,18 +1,22 @@
 import React from 'react';
 import '../styles/home.css';
 import $ from 'jquery';
-import Dashboard from "../components/Dashboard";
-import Employee from "./employees_components/Employee";
-import Function from "./functions_components/Function";
-import Department from "./Department_components/Department";
-import Team from "./teams_components/Team";
-import Review from "./review_component/Review";
-import ResetPassword from './Reset_Password_components/ResetPassword';
-import Role from './roles_component/Role';
-import MasterData from './masterdata_components/MasterData';
+
+import Dashboard from "./Dashboard";
+import Employee from "./Admin/employees_components/Employee";
+import Function from "./Admin/functions_components/Function";
+import Department from "./Admin/Department_components/Department";
+import Team from "./Admin/teams_components/Team";
+import Review from "./Admin/review_component/Review";
+import ResetPassword from './Admin/Reset_Password_components/ResetPassword';
+import Role from './Admin/roles_component/Role';
+import MasterData from './Admin/masterdata_components/MasterData';
+import Objectives from './Objectives/Objectives';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faBars, faCaretDown, faTachometerAlt, faThumbsUp, faBullseye, faTasks, faObjectGroup, faHandshake, faHistory, faAddressBook } from "@fortawesome/free-solid-svg-icons";
 import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
+
 class Home extends React.Component {
     set = () => {
         document.getElementById('body').style.marginLeft = $('.sidebar').width() + 'px';
@@ -37,6 +41,7 @@ class Home extends React.Component {
             $('.icon-item').toggleClass('show');
             $('nav ul .serv-show').removeClass("show1");
             $('nav ul .feat-show').removeClass("show");
+            $('nav ul .obj-show').removeClass("show");
             fun();
         });
         // $(window).click(function(){
@@ -54,6 +59,9 @@ class Home extends React.Component {
         });
         $('.serv-btn').click(function () {
             $('nav ul .serv-show').toggleClass("show1");
+        });
+        $('.obj-btn').click(function () {
+            $('nav ul .obj-show').toggleClass("show");
         });
         $('.nav-right').click(function () {
             $('.not').toggleClass("show")
@@ -80,6 +88,7 @@ class Home extends React.Component {
                         <Route path="/home/resetpassword" component={ResetPassword} />
                         <Route path="/home/role" component={Role} />
                         <Route path="/home/masterdata" component={MasterData} />
+                        <Route path="/home/objectives" component={Objectives} />
                     </Switch>
                 </div>
                 <nav className="sidebar">
@@ -108,8 +117,15 @@ class Home extends React.Component {
                                 <li>Admin Approvals</li>
                             </ul>
                         </li>
-                        <li><span className="icon"><FontAwesomeIcon icon={faBullseye} /></span><span className="icon-item">Objectives</span></li>
-                        <li><span className="icon"><FontAwesomeIcon icon={faObjectGroup} /></span><span className="icon-item">Overview</span></li>
+                        <li className='parentLi'>
+                            <div className="obj-btn" style={{ marginLeft: '38px' }}><span className="icon"><FontAwesomeIcon icon={faObjectGroup} /></span><span className="icon-item">Objectives</span></div>
+                            <ul className="obj-show">
+                                <li><Link style={{ textDecoration: 'none', margin: '0' }} to="/home/objectives/company"><div><span>Company Objectives</span></div></Link></li>
+                                <li><Link style={{ textDecoration: 'none', margin: '0' }} to="/home/objectives/department"><div><span>Department Objectives</span></div></Link></li>
+                                <li><Link style={{ textDecoration: 'none', margin: '0' }} to="/home/objectives/employee"><div><span>Employee Objectives</span></div></Link></li>
+                            </ul>
+                        </li>
+                        <li><span className="icon"><FontAwesomeIcon icon={faBullseye} /></span><span className="icon-item">Overview</span></li>
                         <li><span className="icon"><FontAwesomeIcon icon={faTasks} /></span><span className="icon-item">Weekly Plans</span></li>
                         <li><span className="icon"><FontAwesomeIcon icon={faHandshake} /></span><span className="icon-item">Colaborative Dashboard</span></li>
                         <li><span className="icon"><FontAwesomeIcon icon={faHistory} /></span><span className="icon-item">PMS</span></li>

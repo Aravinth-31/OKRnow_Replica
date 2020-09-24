@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_12_060944) do
+ActiveRecord::Schema.define(version: 2020_09_22_075111) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,6 +26,38 @@ ActiveRecord::Schema.define(version: 2020_09_12_060944) do
     t.integer "role_name_id"
     t.integer "perm_id"
     t.string "perm_name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "authors", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "books", force: :cascade do |t|
+    t.string "name"
+    t.integer "author_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "companykeyresults", force: :cascade do |t|
+    t.string "name"
+    t.decimal "percent", precision: 5, scale: 2, default: "0.0"
+    t.integer "companyobjective_id"
+    t.text "desc"
+    t.string "duedate", default: ""
+    t.string "measType", default: "%"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "companyobjectives", force: :cascade do |t|
+    t.string "name"
+    t.string "quadrant"
+    t.text "desc"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

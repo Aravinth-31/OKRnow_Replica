@@ -1,0 +1,277 @@
+.companyObj .header{
+    background: white;
+    padding: 3%;
+}
+.companyObj .content .obj{
+    background: white;
+    padding: 0px 20px;
+    margin: 0px 5px 10px 0px;
+    margin-left: -15px;
+    border-radius: 5px;
+    height: 80px;
+}
+.companyObj .content .obj .cont{
+    padding: 30px 20px;
+}
+.companyObj .content .obj .circle{
+    display: flex;
+    align-items: center;
+}
+.companyObj .content .obj .circle .objPro{
+    width: 55%;
+}
+.companyObj .content .kr .krPro{
+    width: 85%;
+}
+.companyObj .content .kr{
+    background: white;
+    padding: 10px;
+    min-height: 600px;
+}
+.companyObj .logo{
+    padding: 5px;
+    border-radius: 3px;
+    background: #ffb3d9;
+    color: #DD356E;
+}
+.companyObj .content .obj .dropdown-butn,
+.companyObj .content .key .dropdown-butn{
+    font-size: 18px;
+    display: flex;
+    opacity: 0.5;
+    padding: 10px;
+    padding-top: 18px;
+    padding-right: 20px;
+    align-items: center;
+    cursor: pointer;
+}
+.companyObj .content .obj .dropdown-menu,
+.companyObj .content .key .dropdown-menu{
+    position: absolute;
+    left: -500px;
+}
+.companyObj .content .ob .footer{
+    bottom: 0;
+    width: 40%;
+    display: flex;
+    align-items: center;
+    position: fixed;
+    padding: 20px 0px;
+    padding-left: 5%;
+    overflow: hidden;
+    z-index: 0;
+}
+.companyObj .content .ob .footer button{
+    border:1px solid #DD3561;
+    color: #DD356E;
+    border-radius: 5px;
+    background: white;
+    padding: 6px 16px;
+}
+.companyObj .content .kr .footer{
+    background: white;
+    /* right: 0; */
+    bottom: 0;
+    width: 50%;
+    display: flex;
+    margin-left: -10px;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    padding: 20px;
+    overflow: hidden;
+    z-index: 0;
+    box-shadow: 8px 8px 8px 8px rgba(0, 0, 0, 0.3), 0 6px 20px 0 rgba(0, 0, 0, 0.2);
+}
+.companyObj .content .kr .footer button{
+    border:1px solid #DD3561;
+    color: #DD356E;
+    border-radius: 5px;
+    background: white;
+    padding: 6px 16px;
+}
+.companyObj .AddObj.show,
+.companyObj .AddKey.show{
+    display: block;
+}
+.companyObj .AddObj{
+    display: none;
+    position: fixed;
+    width: 100%;
+    top:8%;
+    z-index: 1;
+    left: 0;
+    height: 92%;
+    background: rgba(0, 0, 0, 0.2);
+}
+.companyObj .AddObj .close,
+.companyObj .AddKey .close{
+    font-size: 18px;
+    color: #DD356E;
+    cursor: pointer;
+}
+.companyObj .AddObj .form{
+    width: 400px;
+    position: fixed;
+    top: 43%;
+    left:27%;
+    padding: 20px;
+    background: white;
+    border-radius: 5px;
+}
+.companyObj .AddKey{
+    display: none;
+    position: fixed;
+    width: 100%;
+    top:8%;
+    z-index: 1;
+    left: 0;
+    height: 92%;
+    background: rgba(0, 0, 0, 0.2);
+}
+.companyObj .AddKey .form{
+    width: 400px;
+    position: fixed;
+    top: 43%;
+    left:65%;
+    padding: 20px;
+    background: white;
+    border-radius: 5px;
+}
+.companyObj .AddObj .form label,
+.companyObj .AddKey .form label{
+    font-size: 10px;
+    padding:0;
+    margin: 0;
+}
+.companyObj .AddObj .form input,
+.companyObj .AddObj .form input:focus,
+.companyObj .AddKey .form input,
+.companyObj .AddKey .form input:focus{
+    width: 100%;
+    padding:3px 10px;
+    background: white;
+    border:0;
+    border-radius: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+.companyObj .AddObj .form input,
+.companyObj .AddObj .form input::-webkit-input-placeholder,
+.companyObj .AddKey .form input,
+.companyObj .AddKey .form input::-webkit-input-placeholder {
+    font-size: 13px;
+    line-height: 3;
+}
+.companyObj .AddObj .form button,
+.companyObj .AddKey .form button{
+    background-color: white;
+    color: #DD356E;
+    border:1px solid #DD356E;
+    padding: 7px 30px;
+    float: right;
+    border-radius: 5px;
+    font: 14px Rubik;
+}
+.companyObj .AddObj .triangle-down {
+	width: 0;
+	height: 0;
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-top: 20px solid white;
+}
+.companyObj .editObj.show{
+    display:flex;
+}
+.companyObj .editObj{
+    position: fixed;
+    width: 100%;
+    top:8%;
+    z-index: 1;
+    left: 0;
+    height: 92%;
+    background: rgba(0, 0, 0, 0.2);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+.companyObj .editObj .form{
+    width: 400px;
+    padding: 10px;
+    margin-top: -10%;
+    border-radius: 10px;
+}
+.companyObj .editObj .form form{
+    background: white;
+    padding:10px 15px;
+}
+.companyObj .editObj .form .close{
+    font-size: 18px;
+    cursor: pointer;
+}
+.companyObj .editObj .form .label,
+.companyObj .editKr .form .label{
+    font-size: 14px;
+}
+.companyObj .editObj .form input,
+.companyObj .editKr .form input,
+.companyObj .editKr .form select{
+    width: 100%;
+}
+.companyObj .editObj .form .cancel,
+.companyObj .editKr .form .cancel{
+    padding:5px 10px;
+    color: #DD356E;
+    cursor: pointer;
+    margin-top: 5px;
+}
+.companyObj .editObj .form .save,
+.companyObj .editKr .form .save{
+    padding:0px 30px;
+    border-radius: 5px;
+    border: 0;
+    background: #DD356E;
+    height: 45px;
+    color: white;
+    font-size: 14px;
+}
+
+.companyObj .editKr.show{
+    display:flex;
+}
+.companyObj .editKr{
+    position: fixed;
+    width: 100%;
+    top:8%;
+    z-index: 1;
+    left: 0;
+    height: 92%;
+    background: rgba(0, 0, 0, 0.2);
+    /* display: none; */    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.companyObj .editKr .form{
+    background: white;
+    width: 400px;
+    padding: 10px 20px;
+    margin-top: -5%;
+    border-radius: 10px;
+}
+.companyObj .editKr .form ul{
+    list-style: none;
+    display: inline-flex;
+}
+.companyObj .editKr .form ul li{
+    margin: 5px 10px;
+    cursor: pointer;
+}
+.companyObj .editKr .form ul li.active{
+    border-bottom: 3px solid #DD356E;
+}
+.companyObj .editKr .form .content .div{
+    display: none;
+}
+.companyObj .editKr .form .content .div.show{
+    display: block;
+}

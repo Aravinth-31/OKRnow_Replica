@@ -1,5 +1,17 @@
 Rails.application.routes.draw do
   namespace :api do
+    namespace :v2 do
+      get 'objectives/index'
+      post 'objectives/companyObjectives'
+      post 'objectives/keyResults'
+      post 'objectives/addCompObjective'
+      post 'objectives/addCompKeyresult'
+      post 'objectives/deleteCompObj'
+      post 'objectives/deleteCompKr'
+      post 'objectives/editCompObj'
+    end
+  end
+  namespace :api do
     namespace :v1 do
       get 'all_roles/index'
       post 'all_roles/create'
