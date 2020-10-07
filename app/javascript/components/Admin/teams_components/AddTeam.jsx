@@ -5,6 +5,7 @@ import Select from 'react-select'
 import { Redirect } from 'react-router-dom';
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Post, Patch,Interceptor } from '../../../utils/Helper';
 
 class AddTeam extends React.Component {
     options = [
@@ -17,16 +18,17 @@ class AddTeam extends React.Component {
         super(props)
         this.state = {
             selectedOptions: [],
-            tname: '',
-            tdept: '',
-            tusers: [],
-            rmngr: [{ name: '', from: '', to: '' }]
+            name: '',
+            dept: '',
+            users: [],
+            reporting_manager: [{ name: '', from: '', to: '' }]
         }
     }
     handleChange = (selectedOptions) => {
         this.setState({ selectedOptions })
     }
     componentDidMount() {
+        Interceptor();
         const This = this;
         $('#check').click(function () {
             $('#date-to').prop('disabled', function (i, v) {
@@ -43,18 +45,17 @@ class AddTeam extends React.Component {
             if (This.props.location.state) {
                 This.update = true;
                 const team = This.props.location.state.team;
-                console.log(team);
                 var options = []
-                team.tusers.map((val, i) => { options.push({ value: val, label: val }) })
+                team.users.map((val, i) => { options.push({ value: val, label: val }) })
                 This.setState({ selectedOptions: options })
                 Object.keys(team).map(function (key, index) {
-                    if (key == 'rmngr') {
+                    if (key == 'reporting_manager') {
                         const val = team[key];
                         val.map((v, i) => {
                             val[i] = JSON.parse(v);
                         });
-                        if(val.length==0)
-                            val=[{name:'',from:'',to:''}];
+                        if (val.length == 0)
+                            val = [{ name: '', from: '', to: '' }];
                         This.setState({ [key]: val });
                     }
                     else
@@ -63,92 +64,53 @@ class AddTeam extends React.Component {
             }
         });
     }
-    add = (e) => {
+    add =async (e) => {
         e.preventDefault();
-        const tusers = []
-        this.state.selectedOptions.map((user, index) => { tusers.push(user.value) });
+        const users = []
+        this.state.selectedOptions.map((user, index) => { users.push(user.value) });
         let emn = [];
-        this.state.rmngr.map((val, index) => {
-            emn.push(val)
+        this.state.reporting_manager.map((val, index) => {
+            emn.push(JSON.stringify(val))
         })
-        emn.map((val, index) => {
-            emn[index] = JSON.stringify(val)
-        })
+        let url = "/api/v1/teams";
+        const { name, dept } = this.state;
+        const body = { name, dept, users, reporting_manager: emn }
         if (this.update) {
-            const url = "/api/v1/teams/update";
-            const { tname, tdept, id } = this.state;
-            const body = { id, tname, tdept, tusers, rmngr: emn }
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-Token": token,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error("Network response was not ok.");
-                })
-                .then(response => {
-                    console.log(response);
-                    this.added = true;
-                    this.forceUpdate();
-                })
-                .catch(error => console.log(error.message));
+            url += '/' + this.state.id;
+            try {
+                const response = await Patch(url, body);
+                console.log(response);
+                this.added = true;
+                this.forceUpdate();
+            } catch (err) { console.log(err); }
         }
         else {
-            const url = "/api/v1/teams/create";
-            const { tname, tdept } = this.state;
-            const body = { tname, tdept, tusers, rmngr: emn };
-            console.log(body);
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-Token": token,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error("Network response was not ok.");
-                })
-                .then(response => {
-                    console.log(response);
-                    this.added = true;
-                    this.forceUpdate();
-                })
-                .catch(error => console.log(error.message));
+            try {
+                const response = await Post(url, body);
+                console.log(response);
+                this.added = true;
+                this.forceUpdate();
+            } catch (err) { console.log(err); }
         }
     }
     onChangeHandler = (e) => {
         this.setState({ [e.target.name]: e.target.value });
     }
     managerHandler = (e, i) => {
-        const mng = this.state.rmngr;
-        var m = mng[i];
-        m[e.target.name] = e.target.value;
-        mng[i] = m;
-        this.setState({ rmngr: mng });
+        const mng = this.state.reporting_manager;
+        mng[i][e.target.name] = e.target.value;
+        this.setState({ reporting_manager: mng });
     }
     addManager = () => {
-        const mng = this.state.rmngr;
+        const mng = this.state.reporting_manager;
         mng.push({ name: '', from: '', to: '' });
-        this.setState({ rmngr: mng }, () => this.forceUpdate);
+        this.setState({ reporting_manager: mng }, () => this.forceUpdate);
     }
     removeManager = (i) => {
         var mng = []
-        this.state.rmngr.map((val, i) => mng.push(val));
+        this.state.reporting_manager.map((val, i) => mng.push(val));
         mng.splice(i, 1)
-        console.log(mng)
-        this.setState({ rmngr: mng }, () => this.forceUpdate());
+        this.setState({ reporting_manager: mng }, () => this.forceUpdate());
     }
     render() {
         if (this.added)
@@ -166,13 +128,13 @@ class AddTeam extends React.Component {
                             <div className="col">
                                 <div className="form-group">
                                     <label>Team Name</label>
-                                    <input className="form-control" type="text" value={this.state.tname} name='tname' onChange={this.onChangeHandler}></input>
+                                    <input className="form-control" type="text" value={this.state.name} name='name' onChange={this.onChangeHandler}></input>
                                 </div>
                             </div>
                             <div className="col">
                                 <div className="form-group">
                                     <label>Department Name</label>
-                                    <select className="form-control" value={this.state.tdept} name='tdept' onChange={this.onChangeHandler}>
+                                    <select className="form-control" value={this.state.dept} name='dept' onChange={this.onChangeHandler}>
                                         <option className="form-control" disabled value="">Select...</option>
                                         <option className="form-control">Back-end</option>
                                         <option className="form-control">Front-end</option>
@@ -195,7 +157,7 @@ class AddTeam extends React.Component {
                                     <th>TO</th>
                                     <th></th>
                                 </tr>
-                                {this.state.rmngr.map((val, index) => {
+                                {this.state.reporting_manager.map((val, index) => {
                                     return (
                                         <tr key={index}>
                                             <td>{index + 1}</td>
@@ -210,7 +172,7 @@ class AddTeam extends React.Component {
                                             <td><input className="form-control" type="date" id="date-to" value={val.to} name="to" onChange={(e) => this.managerHandler(e, index)}></input></td>
                                             <td className="check"><input type="checkbox" name="" id="check" />
                                                 <span>Till now</span>
-                                                {this.state.rmngr.length > 1 ?
+                                                {this.state.reporting_manager.length > 1 ?
                                                     <FontAwesomeIcon icon={faTrash} onClick={() => this.removeManager(index)} className="delete"></FontAwesomeIcon>
                                                     : null
                                                 }

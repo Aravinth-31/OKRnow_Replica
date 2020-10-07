@@ -16,6 +16,7 @@ import Objectives from './Objectives/Objectives';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faBars, faCaretDown, faTachometerAlt, faThumbsUp, faBullseye, faTasks, faObjectGroup, faHandshake, faHistory, faAddressBook } from "@fortawesome/free-solid-svg-icons";
 import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
+import {Interceptor} from '../utils/Helper';
 
 class Home extends React.Component {
     set = () => {
@@ -24,6 +25,7 @@ class Home extends React.Component {
         document.getElementById('body').style.marginTop = $('.nav').height() + 'px';
     }
     componentDidMount() {
+        // Interceptor();
         var fun = this.set
         $(window).resize(function () {
             fun();
@@ -69,10 +71,6 @@ class Home extends React.Component {
         $('.profile-sm,.profile .close').click(function () {
             $('.profile').toggle(300);
         })
-    }
-    redirect = (path) => {
-        this.props.history.push('/home/' + path + '/');
-        console.log('redirect');
     }
     render() {
         return (

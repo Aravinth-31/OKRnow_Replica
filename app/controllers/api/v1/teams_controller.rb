@@ -4,12 +4,12 @@ class Api::V1::TeamsController < ApplicationController
     render json:teams
   end
   def create
-    team=Team.find_by(tname:params[:tname])
+    team=Team.find_by(name:params[:name])
     if(!team)
-      team=Team.create(tname:params[:tname],tdept:params[:tdept],tusers:params[:tusers],rmngr:params[:rmngr])
+      team=Team.create(name:params[:name],dept:params[:dept],users:params[:users],reporting_manager:params[:reporting_manager])
     else
-      if(!team.tusers.include?params[:user])
-        team.tusers << params[:user]
+      if(!team.users.include?params[:user])
+        team.users << params[:user]
         team.save()
       end
     end
@@ -20,16 +20,16 @@ class Api::V1::TeamsController < ApplicationController
     end
   end
   def updateByEmp
-    team=Team.find_by(tname:params[:tname])
+    team=Team.find_by(name:params[:name])
     if(team)
-      if(!team.tusers.include?params[:user])
-        team.tusers << params[:user]
+      if(!team.users.include?params[:user])
+        team.users << params[:user]
         team.save()
       end
     end
-    team=Team.find_by(tname:params[:oldTeam])
+    team=Team.find_by(name:params[:oldTeam])
     if(team)
-      team.tusers.delete(params[:user]);
+      team.users.delete(params[:user]);
       team.save()
     end
     render json:{message:'Success'}
@@ -37,10 +37,10 @@ class Api::V1::TeamsController < ApplicationController
   def update
     id=params[:id]
     puts id
-    team=Team.where(:id=>id).update_all("tname = '"+params[:tname]+"',tdept='"+params[:tdept]+"'")
+    team=Team.where(:id=>id).update_all("name = '"+params[:name]+"',dept='"+params[:dept]+"'")
     team=Team.find_by(id: id)
-    team.tusers=params[:tusers]
-    team.rmngr=params[:rmngr]
+    team.users=params[:users]
+    team.reporting_manager=params[:reporting_manager]
     team.save()
     if team
       render json:team

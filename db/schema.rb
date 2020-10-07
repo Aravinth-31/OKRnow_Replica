@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_22_075111) do
+ActiveRecord::Schema.define(version: 2020_09_30_174313) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 2020_09_22_075111) do
   create_table "all_roles", force: :cascade do |t|
     t.string "section"
     t.string "permit"
+    t.boolean "have"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -30,26 +31,13 @@ ActiveRecord::Schema.define(version: 2020_09_22_075111) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "authors", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
-  create_table "books", force: :cascade do |t|
-    t.string "name"
-    t.integer "author_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
   create_table "companykeyresults", force: :cascade do |t|
     t.string "name"
     t.decimal "percent", precision: 5, scale: 2, default: "0.0"
     t.integer "companyobjective_id"
     t.text "desc"
-    t.string "duedate", default: ""
-    t.string "measType", default: "%"
+    t.string "due_date", default: ""
+    t.string "measure_type", default: "%"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -63,38 +51,79 @@ ActiveRecord::Schema.define(version: 2020_09_22_075111) do
   end
 
   create_table "departments", force: :cascade do |t|
-    t.string "dname", null: false
-    t.string "rmngr", default: [], array: true
+    t.string "name", null: false
+    t.string "reporting_manager", default: [], array: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "deptkeyresults", force: :cascade do |t|
+    t.string "name"
+    t.decimal "percent", precision: 5, scale: 2, default: "0.0"
+    t.text "desc"
+    t.string "duedate"
+    t.string "meastype", default: "%"
+    t.integer "deptobjective_id"
+    t.boolean "iskey"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "deptobjectives", force: :cascade do |t|
+    t.string "name"
+    t.string "desc"
+    t.string "quadrant"
+    t.string "employee", default: ""
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "empkeys", force: :cascade do |t|
+    t.string "name"
+    t.decimal "percent", precision: 5, scale: 2, default: "0.0"
+    t.text "desc"
+    t.string "duedate"
+    t.string "meastype", default: "%"
+    t.integer "empobjective_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "employees", force: :cascade do |t|
-    t.string "ecode"
-    t.string "ename", null: false
-    t.string "edept", null: false
-    t.string "edesg", null: false
-    t.string "eband", null: false
-    t.string "eloc", null: false
-    t.string "erole", default: ""
-    t.string "eemail", null: false
-    t.string "emno", null: false
-    t.string "edoj", null: false
-    t.string "easal", default: ""
-    t.string "evpay", default: ""
-    t.string "ezone", null: false
-    t.string "ecost", default: ""
-    t.string "eteam", null: false
-    t.string "eimg", default: "https://www.nicepng.com/png/detail/136-1366211_group-of-10-guys-login-user-icon-png.png"
-    t.string "epassword", null: false
-    t.string "rmngr", default: [], array: true
+    t.string "name", null: false
+    t.string "code"
+    t.string "dept", null: false
+    t.string "desg", null: false
+    t.string "band", null: false
+    t.string "location", null: false
+    t.string "role", default: ""
+    t.string "email", null: false
+    t.string "mobile_no", null: false
+    t.string "doj", null: false
+    t.string "annual_salary", default: ""
+    t.string "variable_pay", default: ""
+    t.string "zone", null: false
+    t.string "cost", default: ""
+    t.string "team", null: false
+    t.string "image", default: "https://www.nicepng.com/png/detail/136-1366211_group-of-10-guys-login-user-icon-png.png"
+    t.string "password", null: false
+    t.string "reporting_manager", default: [], array: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "empobjectives", force: :cascade do |t|
+    t.string "name"
+    t.string "desc"
+    t.string "quadrant"
+    t.string "employee", default: ""
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "functions", force: :cascade do |t|
-    t.string "fname", null: false
-    t.string "rmngr", default: [], array: true
+    t.string "name", null: false
+    t.string "reporting_manager", default: [], array: true
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -103,33 +132,33 @@ ActiveRecord::Schema.define(version: 2020_09_22_075111) do
     t.string "user"
     t.string "band", default: [], array: true
     t.string "desg", default: [], array: true
-    t.string "loc", default: [], array: true
-    t.string "costCent", default: [], array: true
-    t.string "measType", default: [], array: true
-    t.string "specEmp", default: [], array: true
+    t.string "location", default: [], array: true
+    t.string "cost_center", default: [], array: true
+    t.string "measure_type", default: [], array: true
+    t.string "special_employee", default: [], array: true
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "reviews", force: :cascade do |t|
-    t.string "rname"
-    t.string "tpfrom"
-    t.string "tpto"
-    t.string "krd"
-    t.boolean "perchk"
-    t.boolean "bonlay"
-    t.boolean "salrp"
-    t.string "edoj"
-    t.string "crpfrom"
-    t.string "crpto"
-    t.string "mrfrom"
-    t.string "mrto"
-    t.string "hodfrom"
-    t.string "hodto"
-    t.string "hrfrom"
-    t.string "hrto"
-    t.string "eopfrom"
-    t.string "eopto"
+    t.string "name"
+    t.string "time_period_from"
+    t.string "time_period_to"
+    t.string "kr_deadline"
+    t.boolean "performance_check"
+    t.boolean "bonus_layouts"
+    t.boolean "salary_revisions_and_promotions"
+    t.string "elligibility_of_doj_before"
+    t.string "club_review_period_from"
+    t.string "club_review_period_to"
+    t.string "manager_reviews_from"
+    t.string "manager_reviews_to"
+    t.string "hod_approval_deadline_from"
+    t.string "hod_approval_deadline_to"
+    t.string "hr_completion_from"
+    t.string "hr_completion_to"
+    t.string "end_of_process_from"
+    t.string "end_of_process_to"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -141,21 +170,12 @@ ActiveRecord::Schema.define(version: 2020_09_22_075111) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "roles", force: :cascade do |t|
-    t.string "rname", null: false
-    t.integer "rusers", default: 0
-    t.text "rperms", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
   create_table "teams", force: :cascade do |t|
-    t.string "tname", null: false
-    t.string "tdept", default: ""
-    t.string "tusers", default: [], array: true
-    t.string "rmngr", default: [], array: true
+    t.string "name", null: false
+    t.string "dept", default: ""
+    t.string "users", default: [], array: true
+    t.string "reporting_manager", default: [], array: true
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
-
 end

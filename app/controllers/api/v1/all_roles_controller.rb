@@ -1,31 +1,22 @@
 class Api::V1::AllRolesController < ApplicationController
   def index
-    allroles=AllRole.all.order(created_at: :asc)
-    rolesList={}
-    allroles.map do |role|
-      if rolesList[role.section]
-        rolesList[role.section][role.permit]={:id=>role.id,:name=>role.permit,:have=>false}
-      else
-        rolesList[role.section]={}
-        rolesList[role.section][role.permit]={:id=>role.id,:name=>role.permit,:have=>false}
+    all_roles={}
+    AllRole.select(:section,"min(created_at) as min_created").group(:section).order('min_created').each do |role|
+      all_roles[role.section]={}
+      AllRole.select(:id,:permit,:have).where(:section=>role.section).each do |permit|
+        all_roles[role.section][permit.permit]=permit
       end
     end
-    puts rolesList
-    render json:rolesList
+    render json: all_roles
   end
   def allRoles
     roles=RoleName.all.order(created_at: :asc)
     render json:roles
   end
   def allPerms
-    perms=Allpermission.where(:role_name_id=>params[:id]).order(created_at: :asc)
-    permsid=[]
-    for i in perms
-      permsid << i[:perm_id]
-    end
-    allroles=AllRole.all.order(created_at: :asc)
+    permsid=Allpermission.where(:role_name_id=>params[:id].to_s).pluck(:perm_id)
     rolesList={}
-    allroles.map do |role|
+    AllRole.all.order(created_at: :asc).each do |role|
       have=false
       if permsid.include?(role.id)
         have=true
@@ -69,12 +60,10 @@ class Api::V1::AllRolesController < ApplicationController
         end
       end
     end
-    render json:{:result=>'Updated'}
+    render json:{result:'updated'}
   end
   def destroy
-    id=params[:id]
-    role=RoleName.where(:id => id).destroy_all()
-    puts role
+    role=RoleName.where(:id => params[:id]).destroy_all()
     if role
       render json:role
     else

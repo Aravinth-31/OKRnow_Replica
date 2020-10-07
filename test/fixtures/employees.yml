@@ -1,19 +1,41 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  ecode: MyString
-  ename: MyString
-  edept: MyString
-  edesg: MyString
-  ereptmngr: MyString
-  eband: MyString
-  eloc: MyString
+  name: MyString
+  code: MyString
+  dept: MyString
+  desg: MyString
+  band: MyString
+  location: MyString
+  role: MyString
+  email: MyString
+  mobile_no: MyString
+  doj: MyString
+  annual_salary: MyString
+  variable_pay: MyString
+  zone: MyString
+  cost: MyString
+  team: MyString
+  image: MyString
+  password: MyString
+  reporting_manager: MyString
 
 two:
-  ecode: MyString
-  ename: MyString
-  edept: MyString
-  edesg: MyString
-  ereptmngr: MyString
-  eband: MyString
-  eloc: MyString
+  name: MyString
+  code: MyString
+  dept: MyString
+  desg: MyString
+  band: MyString
+  location: MyString
+  role: MyString
+  email: MyString
+  mobile_no: MyString
+  doj: MyString
+  annual_salary: MyString
+  variable_pay: MyString
+  zone: MyString
+  cost: MyString
+  team: MyString
+  image: MyString
+  password: MyString
+  reporting_manager: MyString

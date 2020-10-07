@@ -1,3 +1,3 @@
 class Team < ApplicationRecord
-    validates :tname, presence: true
+    validates :name, presence: true
 end

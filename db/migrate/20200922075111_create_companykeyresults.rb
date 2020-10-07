@@ -5,8 +5,8 @@ class CreateCompanykeyresults < ActiveRecord::Migration[6.0]
       t.decimal :percent, :precision=>5,:scale=>2,default:0.0
       t.integer :companyobjective_id
       t.text :desc
-      t.string :duedate,default:''
-      t.string :measType,default:'%'
+      t.string :due_date,default:''
+      t.string :measure_type,default:'%'
 
       t.timestamps
     end

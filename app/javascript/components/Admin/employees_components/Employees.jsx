@@ -2,31 +2,27 @@ import React from 'react';
 import '../../../styles/Admin/Employees/Employees.css';
 import { Redirect } from 'react-router-dom';
 import $ from 'jquery';
+import {Get,Interceptor,Post,Delete} from '../../../utils/Helper'
 
 class Employees extends React.Component {
     employee = null;
     month={Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'}
     temp = {
-        'Employee Code': 'ecode',
-        'Employee Name': 'ename',
-        "Date Of Joining": 'edoj',
-        "Official Email": 'eemail',
-        "Band": 'eband',
-        "City": 'eloc',
-        "Department": 'edept',
+        'Employee Code': 'code',
+        'Employee Name': 'name',
+        "Date Of Joining": 'doj',
+        "Official Email": 'email',
+        "Band": 'band',
+        "City": 'location',
+        "Department": 'dept',
         "Department_Code": 'edcode',
-        "Designation": 'edesg',
+        "Designation": 'desg',
         "Function": 'efunc',
-        "Team": 'eteam',
+        "Team": 'team',
         "Team Head": 'thead',
-        // "HOD L1": '',
-        // "HOD L1": '',
-        // "HOD L2": '',
-        // "HOD L2": '',
-        "CostCenter": 'ecost',
-        // "CostCenter_Code": '',
-        "Zone": 'ezone',
-        "MobileNo": 'emno'
+        "CostCenter": 'cost',
+        "Zone": 'zone',
+        "MobileNo": 'mobile_no'
     }
     constructor(props) {
         super(props)
@@ -37,8 +33,8 @@ class Employees extends React.Component {
         this.getdata=this.getdata.bind(this);
     }
     componentDidMount() {
+        Interceptor();
         this.getdata();
-        console.log("mounting")
         const This = this
         $('.import .close').on('click', function () {
             $('.import').removeClass('show');
@@ -72,47 +68,25 @@ class Employees extends React.Component {
             FR.readAsArrayBuffer(file);
         });
     }
-    getdata=()=>{
-        const url = "/api/v1/employees/index";
-        fetch(url)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                this.setState({ employees: response })
+    getdata=async ()=>{
+        const url = "/api/v1/employees";
+        try{
+            const response= await Get(url);
+            this.setState({employees:response},()=>{
                 console.log(this.state.employees);
                 this.forceUpdate();
             })
-            .catch((err) => console.log(err));
+        }catch(err){console.log(err);}
     }
-    delete = (e) => {
-        const url = "/api/v1/employees/destroy";
-        const body = { id: e }
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                console.log(response);
-                this.getdata();
-            })
-            .catch(error => console.log(error.message));
+    delete =async (e) => {
+        const url = "/api/v1/employees/"+e;
+        try{
+            const response=await Delete(url);
+            console.log(response);
+            this.getdata();
+        }catch(err){console.log(err);}
     }
-    change = (e) => {
+    convert = (e) => {
         var name = ''
         e.map((val, i) => {
             val = JSON.parse(val)
@@ -123,107 +97,42 @@ class Employees extends React.Component {
         })
         return name
     }
-    addEmp=(e)=>{
+    addEmp=async (e)=>{
         let emn = [];
-        e.rmngr.map((val, index) => {
-            emn.push(val)
+        e.reporting_manager.map((val, index) => {
+            emn.push(JSON.stringify(val))
         })
-        emn.map((val, index) => {
-            emn[index] = JSON.stringify(val)
-        })
-        const url = "/api/v1/employees/create";
-        const body = e
-        body.rmngr = emn;
-        body.epassword=body.ename,body.easal='',body.evpay='',body.erole='';
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                console.log(response);
-                this.getdata();
-            })
-            .catch(error => console.log(error.message));
+        const url = "/api/v1/employees";
+        const body = {...e,reporting_manager:emn,password:e.name,annual_salary:'',variable_pay:'',role:''};
+        try{
+            const response=await Post(url,body);
+            console.log(response);
+            this.getdata();
+        }catch(err){console.log(err);}
     }
-    addDept=(e)=>{
-        const url = "/api/v1/departments/create";
+    addDept=async (e)=>{
+        const url = "/api/v1/departments";
         const body = e
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => console.log(error.message));
+        try{
+            const response=await Post(url,body);
+            console.log(response);
+        }catch(err){console.log(err);}
     }
-    addTeam=(e)=>{
-        const url = "/api/v1/teams/create";
+    addTeam=async (e)=>{
+        const url = "/api/v1/teams";
         const body = e
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => console.log(error.message));
+        try{
+            const response=await Post(url,body);
+            console.log(response);
+        }catch(err){console.log(err);}
     }
-    addFunc=(e)=>{
-        const url = "/api/v1/functions/create";
+    addFunc=async (e)=>{
+        const url = "/api/v1/functions";
         const body = e
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => console.log(error.message));
+        try{
+            const response=await Post(url,body);
+            console.log(response);
+        }catch(err){console.log(err);}
     }
     upload = (e) => {
         $('#input').val('');
@@ -235,11 +144,11 @@ class Employees extends React.Component {
         data.map((val,index)=>{
             if(index>0 && index+2<data.length){
                 var obj={}
-                obj['rmngr']=[]
+                obj['reporting_manager']=[]
                 val.map((key,i)=>{
                     if(data[0][i]=='ReportingManager Name' && key.length>0)
-                        obj['rmngr'].push({name:key,from:'',to:''});
-                    if(this.temp[data[0][i]]==='edoj'){
+                        obj['reporting_manager'].push({name:key,from:'',to:''});
+                    if(this.temp[data[0][i]]==='doj'){
                         const str1=key.split(" ").reverse();
                         if(str1.length==3)
                             obj[this.temp[data[0][i]]]=str1[0]+'-'+this.month[str1[1]]+'-'+str1[2];
@@ -249,14 +158,14 @@ class Employees extends React.Component {
                 });
                 console.log(obj);
                 this.addEmp(obj);
-                const {edept,edcode}=obj;
-                var body={dname:edept,dcode:edcode,rmngr:[]};
+                const {dept,edcode}=obj;
+                var body={name:dept,dcode:edcode,reporting_manager:[]};
                 this.addDept(body);
-                let {eteam,thead,ename}=obj;
-                const tusers=[ename]
-                body={tname:eteam,rmngr:[JSON.stringify({name:thead,from:'',to:''})],user:ename,tdept:'',tusers}
+                let {team,thead,name}=obj;
+                const users=[name]
+                body={name:team,reporting_manager:[JSON.stringify({name:thead,from:'',to:''})],user:name,dept:'',users}
                 this.addTeam(body)
-                body={fname:obj.efunc,rmngr:[JSON.stringify({name:obj.ename,from:'',to:''})]}
+                body={name:obj.efunc,reporting_manager:[JSON.stringify({name:obj.name,from:'',to:''})]}
                 this.addFunc(body);
             }
         })
@@ -298,13 +207,13 @@ class Employees extends React.Component {
                                     {this.state.employees.map((emp, index) => {
                                         return [
                                             <tr key={index}>
-                                                <td>{emp.ecode}</td>
-                                                <td>{emp.ename}</td>
-                                                <td>{emp.edept}</td>
-                                                <td>{emp.edesg}</td>
-                                                <td>{this.change(emp.rmngr)}</td>
-                                                <td>{emp.eband}</td>
-                                                <td>{emp.eloc}</td>
+                                                <td>{emp.code}</td>
+                                                <td>{emp.name}</td>
+                                                <td>{emp.dept}</td>
+                                                <td>{emp.desg}</td>
+                                                <td>{this.convert(emp.reporting_manager)}</td>
+                                                <td>{emp.band}</td>
+                                                <td>{emp.location}</td>
                                                 <td className="edit">
                                                     <div className="btn-group">
                                                         <p data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" className="dropdown-butn">...</p>

@@ -8,13 +8,4 @@ class Api::V1::LoginController < ApplicationController
       render json: {message:'failure'}
     end
   end
-
-  def create
-  end
-
-  def show
-  end
-
-  def destroy
-  end
 end

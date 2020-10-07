@@ -1,9 +1,15 @@
 class Api::V2::ObjectivesController < ApplicationController
   # require 'roo'
   def index
-    # data=ROO::Spreadsheet.open('C:/Users/ELCOT/Downloads/Employee_Sheet_Example.xlsx')
-    objectives=Companykeyresult.joins(:companyobjective).where(companyobjectives:{id:1},companykeyresults:{id:1})
-    render json: objectives
+    data=Roo::Spreadsheet.open('C:/Users/ELCOT/Downloads/Employee_Sheet_Example.xlsx')
+    # objectives=Companykeyresult.joins(:companyobjective).where(companyobjectives:{id:1},companykeyresults:{id:1})
+    # puts '*****************************come*****************************'
+    # data.each(name:'Employee Name') do |hash|
+    #   puts hash
+    # end
+    # puts data.parse
+    # puts '*****************************come*****************************'
+    render json:data
   end
   def companyObjectives
     objectives=Companyobjective.where(:quadrant=>params[:quadrant]).order(created_at: :asc)
@@ -26,7 +32,7 @@ class Api::V2::ObjectivesController < ApplicationController
     render json:obs
   end
   def keyResults
-    keyresults=Companykeyresult.joins(:companyobjective).where(companyobjectives:{id:params[:id]})
+    keyresults=Companykeyresult.joins(:companyobjective).where(companyobjectives:{id:params[:id]}).order(created_at: :asc)
     puts params[:id]
     render json: keyresults
   end
@@ -70,6 +76,14 @@ class Api::V2::ObjectivesController < ApplicationController
       render json:objective
     else
       render json:objective.errors
+    end
+  end
+  def editCompKr
+    keyresult=Companykeyresult.where(id:params[:id]).update_all("name='"+params[:name]+"',measure_type='"+params[:percent]+"',due_date='"+params[:due]+"'")
+    if keyresult
+      render json:keyresult
+    else
+      render json:keyresult.errors
     end
   end
 end

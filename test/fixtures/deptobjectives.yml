@@ -2,6 +2,12 @@
 
 one:
   name: MyString
+  desc: MyString
+  quadrant: MyString
+  employee: MyString
 
 two:
   name: MyString
+  desc: MyString
+  quadrant: MyString
+  employee: MyString

@@ -4,6 +4,7 @@ import Select from 'react-select'
 import $ from 'jquery';
 import { ToastContainer, toast } from 'react-toastify';    
 import 'react-toastify/dist/ReactToastify.css';  
+import {Get,Interceptor,Post} from '../../../utils/Helper';
 
 class ResetPassword extends React.Component {
     customStyles = {
@@ -36,27 +37,20 @@ class ResetPassword extends React.Component {
             econfirm: ''
         };
     }
-    componentDidMount() {
-        const url = "/api/v1/employees/index";
+    async componentDidMount() {
+        Interceptor();
+        const url = "/api/v1/employees";
         const This = this;
-        fetch(url)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                response.map((emp, index) => {
-                    This.options.push({ value: emp.id, label: emp.ename });
-                });
-                this.forceUpdate();
-            })
-            .catch((err) => console.log(err));
+        try{
+            const response=await Get(url);
+            response.map((emp,index)=>{
+                This.options.push({value:emp.id,label:emp.name});
+            });
+            this.forceUpdate();
+        }catch(err){console.log(err);}
     }
-    update = (e) => {
+    update =async (e) => {
         e.preventDefault();
-        console.log(JSON.stringify(this.state));
         if (this.state.enew.length == 0 || this.state.econfirm.length == 0 || this.state.id.length == 0) {
             $('.error.submit').addClass('show');
             return;
@@ -72,27 +66,12 @@ class ResetPassword extends React.Component {
         const url = "/api/v1/employees/updatepassword";
         const { id, enew } = this.state;
         const body = { id, enew };
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                console.log(response);
-                toast.success("Password Updated", { position: toast.POSITION.TOP_CENTER,closeButton:false,autoClose:2000 });
-                setTimeout(()=>window.location.reload(),1500);
-            })
-            .catch(error => console.log(error.message));
+        try{
+            const response=await Post(url,body);
+            console.log(response);
+            toast.success("Password Updated", { position: toast.POSITION.TOP_CENTER,closeButton:false,autoClose:2000 });
+            setTimeout(()=>window.location.reload(),1500);
+        }catch(err){console.log(err);}
     }
     onChangeHandler = (e) => {
         this.setState({ [e.target.name]: e.target.value });

@@ -1,3 +1,3 @@
 class Function < ApplicationRecord
-    validates :fname, presence: true
+    validates :name, presence: true
 end

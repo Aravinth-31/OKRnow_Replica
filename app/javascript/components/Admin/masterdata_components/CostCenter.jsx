@@ -21,7 +21,7 @@ class CostCenter extends React.Component {
                         <div className="group d-flex mt-2">
                             <input name='data' onChange={this.onChangeHandler} className="form-control border-top-0 border-left-0 border-right-0 rounded-0 col-5" placeholder="Enter Cost Center"></input>
                             <button className="addBand col-2 ml-4 rounded" onClick={() => {
-                                this.props.handleChange('costCent', 'add', this.state.data);
+                                this.props.handleChange('cost_center', 'add', this.state.data);
                                 this.setState({ data: '' });
                             }}>Add</button>
                         </div>
@@ -33,7 +33,7 @@ class CostCenter extends React.Component {
                     <ul className="mt-3 d-flex">
                         {this.props.data.map((centre, index) => {
                             return (
-                                <li className="" key={index}><span className="title mr-4">{centre}</span><span className="closer" onClick={() => this.props.handleChange('costCent', 'delete', centre)}>X</span></li>
+                                <li className="" key={index}><span className="title mr-4">{centre}</span><span className="closer" onClick={() => this.props.handleChange('cost_center', 'delete', centre)}>X</span></li>
                             );
                         })}
                     </ul>

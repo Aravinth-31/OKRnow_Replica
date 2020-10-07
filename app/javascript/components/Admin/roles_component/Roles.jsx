@@ -3,6 +3,7 @@ import '../../../styles/Admin/Roles/Roles.css';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Redirect } from 'react-router-dom';
+import {Get,Delete,Interceptor} from '../../../utils/Helper';
 
 class Roles extends React.Component {
     role = null;
@@ -13,47 +14,26 @@ class Roles extends React.Component {
         };
     }
     componentDidMount() {
+        Interceptor();
         this.getData();
     }
-    getData = () => {
+    getData =async () => {
         const url = "/api/v1/all_roles/allRoles";
-        fetch(url)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                this.setState({ roles: response })
+        try{
+            const response=await Get(url);
+            this.setState({roles:response},()=>{
                 console.log(this.state.roles);
                 this.forceUpdate();
             })
-            .catch((err) => console.log(err));
+        }catch(err){console.log(err);}
     }
-    delete = (e) => {
-        const url = "/api/v1/all_roles/destroy";
-        const body = { id: e }
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                console.log(response);
-                this.getData();
-            })
-            .catch(error => console.log(error.message));
+    delete =async (e) => {
+        const url = "/api/v1/all_roles/"+e;
+        try{
+            const response=await Delete(url);
+            console.log(response);
+            this.getData();
+        }catch(err){console.log(err);}
     }
     render() {
         if (this.role != null)

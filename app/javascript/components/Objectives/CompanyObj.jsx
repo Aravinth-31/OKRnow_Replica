@@ -5,8 +5,8 @@ import { faPlusCircle, faCommentAlt, faEllipsisV } from '@fortawesome/free-solid
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-// import PercentageCircle from 'reactjs-percentage-circle';
 import $ from 'jquery';
+import { passCsrfToken, csrfToken, Post, onChangeHandler, Interceptor } from '../../utils/Helper';
 
 class CompanyObj extends React.Component {
     optionM = [
@@ -30,10 +30,15 @@ class CompanyObj extends React.Component {
             newKeyName: '',
             newKeyDesc: '',
             editObjid: 0,
-            editObjname: ''
+            editObjname: '',
+            editKrname: '',
+            editKrid: 0,
+            editKrpercent: '%',
+            editKrdue: ''
         }
     }
     componentDidMount() {
+        Interceptor();
         this.getObjectives();
         const This = this;
         $('#addObjBtn').click(function () {
@@ -58,61 +63,35 @@ class CompanyObj extends React.Component {
             $(this).addClass('active').siblings().removeClass('active');
             $('.editKr .content .' + $(this).attr('name')).addClass('show').siblings().removeClass('show')
         })
+        $('.editKr .close,.editKr .cancel').on('click', function () {
+            This.setState({ editKrid: 0, editKrname: '', editKrpercent: '%', editKrdue: '' });
+            $('.editKr').removeClass('show');
+        })
     }
-    getObjectives = () => {
+    getObjectives = async () => {
         const url = "/api/v2/objectives/companyObjectives";
         const body = { quadrant: this.quadrant }
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
+        try {
+            const response = await Post(url, body)
+            if (response.length > 0 && this.id == 0)
+                this.id = response[0].id
+            this.setState({ objectives: response }, () => {
+                console.log(this.state.objectives);
+                this.forceUpdate();
             })
-            .then(response => {
-                if (response.length > 0 && this.id == 0)
-                    this.id = response[0].id
-                this.setState({ objectives: response }, () => {
-                    console.log(this.state.objectives);
-                    this.forceUpdate();
-                })
-                this.getKeyresults();
-            })
-            .catch((err) => console.log(err));
+            this.getKeyresults();
+        } catch (err) { console.log(err); }
     }
-    getKeyresults = () => {
+    getKeyresults = async () => {
         const url = "/api/v2/objectives/keyResults";
         const body = { id: this.id }
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
+        try {
+            const response = await Post(url, body)
+            this.setState({ keyresults: response }, () => {
+                console.log('kr-', this.state.keyresults)
+                this.forceUpdate()
             })
-            .then(response => {
-                this.setState({ keyresults: response }, () => {
-                    console.log('this', this.state.keyresults)
-                    this.forceUpdate()
-                })
-            })
-            .catch((err) => console.log(err));
+        } catch (err) { console.log(err); }
     }
     changeObj = (id) => {
         if (this.id != id) {
@@ -120,111 +99,66 @@ class CompanyObj extends React.Component {
             this.getKeyresults();
         }
     }
-    onChangeHandler = (e) => {
-        this.setState({ [e.target.name]: e.target.value });
-    }
-    AddObj = (e) => {
+    Add = async (e, flag) => {
         e.preventDefault();
-        const url = '/api/v2/objectives/addCompObjective'
-        const body = { name: this.state.newObjName, desc: this.state.newObjDesc, quadrant: this.quadrant }
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok)
-                    return response.json()
-                throw new Error('Network response was not ok.');
-            })
-            .then(response => {
-                console.log(response);
-                this.getObjectives();
-            })
-            .catch(err => console.log(err));
-        this.setState({ newObjDesc: '', newObjName: '' }, () => $('.AddObj').removeClass('show'));
+        let url = '';
+        let body = {};
+        if (flag === 'obj') {
+            url = '/api/v2/objectives/addCompObjective'
+            body = { name: this.state.newObjName, desc: this.state.newObjDesc, quadrant: this.quadrant }
+            this.setState({ newObjDesc: '', newObjName: '' }, () => $('.AddObj').removeClass('show'));
+        }
+        else {
+            url = '/api/v2/objectives/addCompKeyresult'
+            body = { name: this.state.newKeyName, desc: this.state.newKeyDesc, id: this.id }
+            this.setState({ newKeyDesc: '', newKeyName: '' }, () => $('.AddKey').removeClass('show'));
+        }
+        try {
+            const response = await Post(url, body)
+            console.log(response);
+            this.getObjectives();
+        } catch (err) { console.log(err); }
+
     }
-    AddKey = (e) => {
-        e.preventDefault();
-        const url = '/api/v2/objectives/addCompKeyresult'
-        const body = { name: this.state.newKeyName, desc: this.state.newKeyDesc, id: this.id }
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-Token': token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok)
-                    return response.json();
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                console.log(response);
-                this.getObjectives();
-            })
-            .catch(err => console.log(err));
-        this.setState({ newKeyDesc: '', newKeyName: '' }, () => $('.AddKey').removeClass('show'));
-    }
-    delete = (id, opt) => {
+    delete = async (id, opt) => {
         let url = '';
         if (opt === 'obj')
             url = '/api/v2/objectives/deleteCompObj';
         else
             url = '/api/v2/objectives/deleteCompKr';
         const body = { id };
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                'X-CSRF-Token': token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok)
-                    return response.json();
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                console.log(response);
-                this.getObjectives();
-            })
-            .catch(err => console.log(err));
-    }
-    editObj = (e) => {
-        e.preventDefault();
-        const url = '/api/v2/objectives/editCompObj';
-        const body = { id: this.state.editObjid, name: this.state.editObjname };
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        }).then(response => {
-            if (response.ok)
-                return response.json()
-            throw new Error("Network response was not ok.");
-        }).then(response => {
+        try {
+            const response = await Post(url, body)
             console.log(response);
-            this.setState({ editObjid: 0, editObjname: '' }, () => $('.editObj').removeClass('show'));
             this.getObjectives();
-        }).catch(err => console.log(err));
+        } catch (err) { console.log(err); }
+
+    }
+    edit = async (e, flag) => {
+        e.preventDefault();
+        let url = '';
+        let body = {}
+        if (flag === 'obj') {
+            url = '/api/v2/objectives/editCompObj';
+            body = { id: this.state.editObjid, name: this.state.editObjname };
+        }
+        else {
+            url = '/api/v2/objectives/editCompKr';
+            body = { id: this.state.editKrid, name: this.state.editKrname, percent: this.state.editKrpercent, due: this.state.editKrdue };
+        }
+        try {
+            const response = await Post(url, body)
+            console.log(response);
+            if (flag === 'obj')
+                this.setState({ editObjid: 0, editObjname: '' }, () => $('.editObj').removeClass('show'));
+            else
+                this.setState({ editKrid: 0, editKrname: '', editKrdue: '', editKrpercent: '%' }, () => $('.editKr').removeClass('show'));
+            this.getObjectives();
+        } catch (err) { console.log(err); }
     }
     render() {
         return (
-            <div className="companyObj">
+            <div className="companyObj Obj">
                 <div className='header row'>
                     <div className='col d-flex align-items-center'>
                         <div className='float-left'><h5>Company Objectives</h5></div>
@@ -299,7 +233,7 @@ class CompanyObj extends React.Component {
                                                 <CircularProgressbar
                                                     value={Math.round(key.percent)}
                                                     className='krPro'
-                                                    text={`${Math.round(key.percent)}%`}
+                                                    text={`${Math.round(key.percent) + key.measure_type}`}
                                                     styles={buildStyles({
                                                         rotation: 0.25, textSize: '25px', pathTransitionDuration: 0.5, pathColor: `#ff8095`, textColor: '#f88', trailColor: '#d6d6d6',
                                                     })}
@@ -310,7 +244,9 @@ class CompanyObj extends React.Component {
                                                 <div className="btn-group pl-3">
                                                     <p data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" className="dropdown-butn"><FontAwesomeIcon icon={faEllipsisV} /></p>
                                                     <div className="dropdown-menu">
-                                                        <button className="dropdown-item" type="button">Edit KR</button>
+                                                        <button className="dropdown-item" type="button" onClick={() => {
+                                                            this.setState({ editKrid: key.id, editKrname: key.name }, () => $('.editKr').addClass('show'));
+                                                        }}>Edit KR</button>
                                                         <button className="dropdown-item" type="button">Set Due Date</button>
                                                         <button className="dropdown-item" type="button">Change Quarter</button>
                                                         <button className="dropdown-item" type="button">Set High Priority</button>
@@ -343,14 +279,14 @@ class CompanyObj extends React.Component {
                         <h6>Add Objective</h6>
                         <p>
                             <label>TITLE OF OBJECTIVE</label><br />
-                            <input type='text' placeholder='Title goes here...' className='form-control' name='newObjName' value={this.state.newObjName} onChange={this.onChangeHandler} />
+                            <input type='text' placeholder='Title goes here...' className='form-control' name='newObjName' value={this.state.newObjName} onChange={(e) => onChangeHandler(e, this)} />
                         </p>
                         <p>
                             <label>SHORT DESCRIPTION</label><br />
-                            <input type='text' placeholder='Description goes here...' className='form-control' name='newObjDesc' value={this.state.newObjDesc} onChange={this.onChangeHandler} />
+                            <input type='text' placeholder='Description goes here...' className='form-control' name='newObjDesc' value={this.state.newObjDesc} onChange={(e) => onChangeHandler(e, this)} />
                         </p>
                         <p className='pt-2 pb-4 px-2'>
-                            <button onClick={(e) => this.AddObj(e)}>Save</button>
+                            <button onClick={(e) => this.Add(e, 'obj')}>Save</button>
                         </p>
                     </div>
                 </div>
@@ -360,14 +296,14 @@ class CompanyObj extends React.Component {
                         <h6>Add Key Result</h6>
                         <p>
                             <label>TITLE OF KEYRESULT</label><br />
-                            <input type='text' placeholder='Title goes here...' className='form-control' name='newKeyName' value={this.state.newKeyName} onChange={this.onChangeHandler} />
+                            <input type='text' placeholder='Title goes here...' className='form-control' name='newKeyName' value={this.state.newKeyName} onChange={(e) => onChangeHandler(e, this)} />
                         </p>
                         <p>
                             <label>SHORT DESCRIPTION</label><br />
-                            <input type='text' placeholder='Description goes here...' className='form-control' name='newKeyDesc' value={this.state.newKeyDesc} onChange={this.onChangeHandler} />
+                            <input type='text' placeholder='Description goes here...' className='form-control' name='newKeyDesc' value={this.state.newKeyDesc} onChange={(e) => onChangeHandler(e, this)} />
                         </p>
                         <p className='pt-2 pb-4 px-2'>
-                            <button onClick={(e) => this.AddKey(e)}>Save</button>
+                            <button onClick={(e) => this.Add(e, 'kr')}>Save</button>
                         </p>
                     </div>
                 </div>
@@ -379,14 +315,14 @@ class CompanyObj extends React.Component {
                                 <h4>Edit Objective</h4><br />
                                 <div>
                                     <label className='label'>Edit Name For Objective</label>
-                                    <input type='text' className='form-control' name='editObjname' value={this.state.editObjname} onChange={this.onChangeHandler}></input>
+                                    <input type='text' className='form-control' name='editObjname' value={this.state.editObjname} onChange={(e) => onChangeHandler(e, this)}></input>
                                 </div>
-                                <div className='row'>
+                                <div className='row mt-2'>
                                     <div className='col-6 d-flex justify-content-end align-items-center'>
                                         <p className='cancel'>Cancel</p>
                                     </div>
                                     <div className='col-6 d-flex justify-content-center'>
-                                        <button className='save' onClick={(e) => this.editObj(e)}>Save</button>
+                                        <button className='save' onClick={(e) => this.edit(e, 'obj')}>Save</button>
                                     </div>
                                 </div>
                             </form>
@@ -407,27 +343,27 @@ class CompanyObj extends React.Component {
                             <div className='li1 div show'>
                                 <div>
                                     <label className='label'>Edit Name For Key Result</label>
-                                    <input className='form-control'></input>
+                                    <input className='form-control' name='editKrname' value={this.state.editKrname} onChange={(e) => onChangeHandler(e, this)}></input>
                                 </div>
                             </div>
                             <div className='li2 div'>
                                 <div>
                                     <label className='label'>Edit Metrices For Key Result</label><br />
                                     <label className='label'>Measure Type</label>
-                                    <select className='form-control'>
-                                        <option value="%"></option>
-                                        <option value="VB"></option>
-                                    </select><br />
+                                    <select className='form-control p-0' name='editKrpercent' value={this.state.editKrpercent} onChange={(e) => onChangeHandler(e, this)}>
+                                        <option value="%">%</option>
+                                        <option value="VB">VB</option>
+                                    </select>
                                     <label className='label'>Min Value</label>
-                                    <input className='form-control' value='0' disabled></input><br />
+                                    <input className='form-control' value='0' disabled></input>
                                     <label className='label'>Max Value</label>
-                                    <input className='form-control' value='100' disabled></input><br />
+                                    <input className='form-control' value='100' disabled></input>
                                 </div>
                             </div>
                             <div className='li3 div'>
                                 <div>
                                     <label className='label'>Edit Due Date For Key Result</label>
-                                    <input className='form-control' type='date'></input>
+                                    <input className='form-control' type='date' name='editKrdue' value={this.state.editKrdue} onChange={(e) => onChangeHandler(e, this)}></input>
                                 </div>
                             </div>
                         </div>
@@ -436,7 +372,7 @@ class CompanyObj extends React.Component {
                                 <p className='cancel'>Cancel</p>
                             </div>
                             <div className='col-6 d-flex justify-content-center'>
-                                <button className='save' onClick={(e) => this.editObj(e)}>Save</button>
+                                <button className='save' onClick={(e) => this.edit(e, 'kr')}>Save</button>
                             </div>
                         </div>
                     </div>

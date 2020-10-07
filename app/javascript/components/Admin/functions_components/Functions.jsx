@@ -4,10 +4,10 @@ import '../../../styles/Admin/Functions/Functions.css';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Redirect } from 'react-router-dom';
+import {Get,Delete,Interceptor} from '../../../utils/Helper';
 
 class Functions extends React.Component {
     functions = [{ name: 'Development', hod: 'Vinitha Shree' }, { name: 'Function 1', hod: 'Suresh Kumar' }];
-    // functions = [];
     function = null;
     constructor(props) {
         super(props)
@@ -16,6 +16,7 @@ class Functions extends React.Component {
         };
     }
     componentDidMount() {
+        Interceptor();
         this.getData();
         $(document).ready(function () {
             $('[data-toggle="tooltip"]').tooltip();
@@ -24,47 +25,25 @@ class Functions extends React.Component {
             $('.Title').prop('data-placement', 'top');
         });
     }
-    getData=()=>{
-        const url = "/api/v1/functions/index";
-        fetch(url)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                this.setState({ functions: response })
+    getData=async ()=>{
+        const url = "/api/v1/functions";
+        try{
+            const response=await Get(url);
+            this.setState({functions:response},()=>{
                 console.log(this.state.functions);
                 this.forceUpdate();
             })
-            .catch((err) => console.log(err));
+        }catch(err){console.log(err);}
     }
-    delete = (e) => {
-        const url = "/api/v1/functions/destroy";
-        const body = { id: e }
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                console.log(response);
-                this.getData();
-            })
-            .catch(error => console.log(error.message));
+    delete =async (e) => {
+        const url = "/api/v1/functions/"+e;
+        try{
+            const response=await Delete(url);
+            console.log(response);
+            this.getData();
+        }catch(err){console.log(err);}
     }
-    change=(e)=>{
+    convert=(e)=>{
         var name=''
         e.map((val,i)=>{
             val=JSON.parse(val)
@@ -77,7 +56,6 @@ class Functions extends React.Component {
     }
     render() {
         if (this.function != null) {
-            // return <AddEmployee employee={this.employee}></AddEmployee>
             return <Redirect to={{ pathname: '/home/function/add', state: { function: this.function } }}></Redirect>
         }
         else
@@ -101,8 +79,8 @@ class Functions extends React.Component {
                         {this.state.functions.length > 0 ?
                             this.state.functions.map((person, index) => (
                                 <div className="row" key={index.toString()}>
-                                    <div className="col col-3">{person.fname}</div>
-                                    <div className="col col-4">{this.change(person.rmngr)}</div>
+                                    <div className="col col-3">{person.name}</div>
+                                    <div className="col col-4">{this.convert(person.reporting_manager)}</div>
                                     <div className="col col-3 edit"><span className="Edit" onClick={() => {
                                         this.function = person;
                                         this.forceUpdate();

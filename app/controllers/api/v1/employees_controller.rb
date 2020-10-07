@@ -5,15 +5,12 @@ class Api::V1::EmployeesController < ApplicationController
   end
 
   def create
-    employee=Employee.create(ecode:params[:ecode],ename:params[:ename],edept:params[:edept],edesg:params[:edesg],eband:params[:eband],eloc:params[:eloc],erole:params[:erole], eemail:params[:eemail], emno:params[:emno], edoj:params[:edoj], easal:params[:easal], evpay:params[:evpay], ezone:params[:ezone], ecost:params[:ecost], eteam:params[:eteam],epassword:params[:epassword],rmngr:params[:rmngr])
+    employee=Employee.create(code:params[:code],name:params[:name],dept:params[:dept],desg:params[:desg],band:params[:band],location:params[:location],role:params[:role], email:params[:email], mobile_no:params[:mobile_no], doj:params[:doj], annual_salary:params[:annual_salary], variable_pay:params[:variable_pay], zone:params[:zone], cost:params[:cost], team:params[:team],password:params[:password],reporting_manager:params[:reporting_manager])
     if employee[:id]
       render json:employee
     else
       render json:employee.errors
     end
-  end
-
-  def show
   end
 
   def destroy
@@ -28,9 +25,9 @@ class Api::V1::EmployeesController < ApplicationController
   end
   def update
     id=params[:id]
-    Employee.where(:id=>id).update_all("ecode = '"+params[:ecode]+"',ename='"+params[:ename]+"',edept='"+params[:edept]+"',edesg='"+params[:edesg]+"',eband='"+params[:eband]+"',eloc='"+params[:eloc]+"',erole='"+params[:erole]+"', eemail='"+params[:eemail]+"', emno='"+params[:emno]+"', edoj='"+params[:edoj]+"', easal='"+params[:easal]+"', evpay='"+params[:evpay]+"', ezone='"+params[:ezone]+"', ecost='"+params[:ecost]+"', eteam='"+params[:eteam]+"', epassword='"+params[:epassword]+"'")
+    Employee.where(:id=>id).update_all("code = '"+params[:code]+"',name='"+params[:name]+"',dept='"+params[:dept]+"',desg='"+params[:desg]+"',band='"+params[:band]+"',location='"+params[:location]+"',role='"+params[:role]+"', email='"+params[:email]+"', mobile_no='"+params[:mobile_no]+"', doj='"+params[:doj]+"', annual_salary='"+params[:annual_salary]+"', variable_pay='"+params[:variable_pay]+"', zone='"+params[:zone]+"', cost='"+params[:cost]+"', team='"+params[:team]+"', password='"+params[:password]+"'")
     employee=Employee.find_by(id: id)
-    employee.rmngr=params[:rmngr]
+    employee.reporting_manager=params[:reporting_manager]
     employee.save()
     if employee
       render json:employee
@@ -41,7 +38,7 @@ class Api::V1::EmployeesController < ApplicationController
   def updatepassword
     id=params[:id]
     employee=Employee.find_by(id: id)
-    employee.epassword=params[:enew]
+    employee.password=params[:enew]
     employee.save
     if employee
       render json: employee

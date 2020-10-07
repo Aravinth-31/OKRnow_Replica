@@ -4,23 +4,25 @@ import $ from 'jquery'
 import { Redirect } from 'react-router-dom';
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Post, Interceptor,Patch } from '../../../utils/Helper';
 
 class AddDepartment extends React.Component {
     update = false;
-    added=false;
+    added = false;
     constructor(props) {
         super(props);
         this.state = {
-            dname: '',
+            name: '',
             dhod: '',
             dfrom: '',
             dto: '',
-            rmngr: [{ name: '', from: '', to: '' }]
+            reporting_manager: [{ name: '', from: '', to: '' }]
         }
     }
     componentDidMount() {
+        Interceptor();
         const This = this;
-        $('#check').click(function () {
+        $('#check').on('click',function () {
             $('#date-to').prop('disabled', function (i, v) {
                 return !v;
             })
@@ -38,106 +40,65 @@ class AddDepartment extends React.Component {
                 const emp = This.props.location.state.department;
                 console.log(emp);
                 Object.keys(emp).map(function (key, index) {
-                    if(key=='rmngr'){
-                        const val=emp[key];
-                        val.map((v,i)=>{
-                            val[i]=JSON.parse(v);
+                    if (key == 'reporting_manager') {
+                        const val = emp[key];
+                        val.map((v, i) => {
+                            val[i] = JSON.parse(v);
                         });
-                        if(val.length==0)
-                            val=[{name:'',from:'',to:''}];
-                        This.setState({ [key]: val});
+                        if (val.length == 0)
+                            val = [{ name: '', from: '', to: '' }];
+                        This.setState({ [key]: val });
                     }
                     else
-                    This.setState({ [key]: emp[key] });
+                        This.setState({ [key]: emp[key] });
                 })
             }
         });
-
     }
-    add = (e) => {
+    add = async (e) => {
         e.preventDefault();
-        console.log(this.state);
-        let emn=[];
-        this.state.rmngr.map((val, index)=>{
-            emn.push(val)
+        let emn = [];
+        this.state.reporting_manager.map((val, index) => {
+            emn.push(JSON.stringify(val))
         })
-        emn.map((val,index)=>{
-            emn[index]=JSON.stringify(val)
-        })
+        const body ={...this.state,reporting_manager:emn};
+        let url = "/api/v1/departments";
         if (this.update) {
-            const url = "/api/v1/departments/update";
-            const body = this.state
-            body.rmngr=emn;
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-Token": token,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error("Network response was not ok.");
-                })
-                .then(response => {
-                    console.log(response);
-                    this.added = true;
-                    this.forceUpdate();
-                })
-                .catch(error => console.log(error.message));
+            try {
+                url+='/'+body.id;
+                const response = await Patch(url, body);
+                console.log(response);
+                this.added = true;
+                this.forceUpdate();
+            } catch (err) { console.log(err); }
         }
         else {
-            const url = "/api/v1/departments/create";
-            const body = this.state
-            body.rmngr=emn;
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-Token": token,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error("Network response was not ok.");
-                })
-                .then(response => {
-                    console.log(response);
-                    this.added = true;
-                    this.forceUpdate();
-                })
-                .catch(error => console.log(error.message));
+            try {
+                const response = await Post(url, body);
+                console.log(response);
+                this.added = true;
+                this.forceUpdate();
+            } catch (err) { console.log(err); }
         }
     }
     onChangeHandler = (e) => {
         this.setState({ [e.target.name]: e.target.value });
     }
-    managerHandler=(e,i)=>{
-        const mng=this.state.rmngr;
-        var m=mng[i];
-        m[e.target.name]=e.target.value;
-        mng[i]=m;
-        this.setState({rmngr:mng});
+    managerHandler = (e, i) => {
+        const mng = this.state.reporting_manager;
+        mng[i][e.target.name]=e.target.value;
+        this.setState({ reporting_manager: mng });
     }
-    addManager=()=>{
-        const mng=this.state.rmngr;
-        mng.push({name:'',from:'',to:''});
-        this.setState({rmngr:mng},()=>this.forceUpdate);
+    addManager = () => {
+        const mng = this.state.reporting_manager;
+        mng.push({ name: '', from: '', to: '' });
+        this.setState({ reporting_manager: mng }, () => this.forceUpdate);
     }
     removeManager = (i) => {
         var mng = []
-        this.state.rmngr.map((val, i) => mng.push(val));
+        this.state.reporting_manager.map((val, i) => mng.push(val));
         mng.splice(i, 1)
-        console.log(mng)
-        this.setState({ rmngr: mng }, () => this.forceUpdate());
+        this.setState({ reporting_manager: mng }, () => this.forceUpdate());
     }
     render() {
         if (this.added)
@@ -153,7 +114,7 @@ class AddDepartment extends React.Component {
                     <div className="form">
                         <div className="form-group">
                             <label>Department Name</label>
-                            <input className="form-control" type="text" name="dname" onChange={this.onChangeHandler} value={this.state.dname}></input>
+                            <input className="form-control" type="text" name="name" onChange={this.onChangeHandler} value={this.state.name}></input>
                         </div>
                     </div>
                     <br />
@@ -170,26 +131,26 @@ class AddDepartment extends React.Component {
                                     <th>TO</th>
                                     <th></th>
                                 </tr>
-                                {this.state.rmngr.map((val, index) => {
+                                {this.state.reporting_manager.map((val, index) => {
                                     return (
                                         <tr key={index}>
                                             <td>{index + 1}</td>
                                             <td>
-                                                <select className="form-control" value={val.name} name="name" onChange={(e)=>this.managerHandler(e,index)}>
+                                                <select className="form-control" value={val.name} name="name" onChange={(e) => this.managerHandler(e, index)}>
                                                     <option className="form-control" disabled value=''>Select</option>
                                                     <option className="form-control" value='Suresh Kumar'>Suresh Kumar</option>
                                                     <option className="form-control" value='Vinitha Shree'>Vinitha Shree</option>
                                                 </select>
                                             </td>
-                                            <td><input className="form-control" type="date" id="date-from" value={val.from} name="from"  onChange={(e)=>this.managerHandler(e,index)}></input></td>
-                                            <td><input className="form-control" type="date" id="date-to" value={val.to} name="to"  onChange={(e)=>this.managerHandler(e,index)}></input></td>
+                                            <td><input className="form-control" type="date" id="date-from" value={val.from} name="from" onChange={(e) => this.managerHandler(e, index)}></input></td>
+                                            <td><input className="form-control" type="date" id="date-to" value={val.to} name="to" onChange={(e) => this.managerHandler(e, index)}></input></td>
                                             <td className="check">
                                                 <input type="checkbox" name="" id="check" /><span>Till now</span>
-                                                {this.state.rmngr.length > 1 ?
+                                                {this.state.reporting_manager.length > 1 ?
                                                     <FontAwesomeIcon icon={faTrash} onClick={() => this.removeManager(index)} className="delete"></FontAwesomeIcon>
                                                     : null
                                                 }
-                                                </td>
+                                            </td>
                                         </tr>
                                     );
                                 })}

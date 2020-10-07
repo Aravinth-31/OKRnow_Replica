@@ -4,6 +4,7 @@ import $ from 'jquery'
 import { Redirect } from 'react-router-dom';
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {Post,Patch,Interceptor} from '../../../utils/Helper';
 
 class AddFunc extends React.Component {
     update = false;
@@ -11,16 +12,17 @@ class AddFunc extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            fname: '',
+            name: '',
             fhod: '',
             ffrom: '',
             fto: '',
-            rmngr: [{ name: '', from: '', to: '' }]
+            reporting_manager: [{ name: '', from: '', to: '' }]
         }
     }
     componentDidMount() {
+        Interceptor();
         const This = this;
-        $('#check').click(function () {
+        $('#check').on('click',function () {
             $('#date-to').prop('disabled', function (i, v) {
                 return !v;
             })
@@ -38,7 +40,7 @@ class AddFunc extends React.Component {
                 const emp = This.props.location.state.function;
                 console.log(emp);
                 Object.keys(emp).map(function (key, index) {
-                    if (key == 'rmngr') {
+                    if (key == 'reporting_manager') {
                         const val = emp[key];
                         val.map((v, i) => {
                             val[i] = JSON.parse(v);
@@ -52,92 +54,52 @@ class AddFunc extends React.Component {
                 })
             }
         });
-
     }
-    add = (e) => {
+    add =async (e) => {
         e.preventDefault();
         console.log(this.state);
         let emn = [];
-        this.state.rmngr.map((val, index) => {
-            emn.push(val)
+        this.state.reporting_manager.map((val, index) => {
+            emn.push(JSON.stringify(val))
         })
-        emn.map((val, index) => {
-            emn[index] = JSON.stringify(val)
-        })
+        let url="/api/v1/functions";
+        const body = {...this.state,reporting_manager:emn};
         if (this.update) {
-            const url = "/api/v1/functions/update";
-            const body = this.state
-            body.rmngr = emn;
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-Token": token,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error("Network response was not ok.");
-                })
-                .then(response => {
-                    console.log(response);
-                    this.added = true;
-                    this.forceUpdate();
-                })
-                .catch(error => console.log(error.message));
+            try{
+                url+='/'+body.id;
+                const response=await Patch(url,body);
+                console.log(response);
+                this.added=true;
+                this.forceUpdate();
+            }catch(err){console.log(err);}
         }
         else {
-            const url = "/api/v1/functions/create";
-            const body = this.state
-            body.rmngr = emn;
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-Token": token,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error("Network response was not ok.");
-                })
-                .then(response => {
-                    console.log(response);
-                    this.added = true;
-                    this.forceUpdate();
-                })
-                .catch(error => console.log(error.message));
+            try{
+                const response=await Post(url,body);
+                console.log(response);
+                this.added=true;
+                this.forceUpdate();
+            }catch(err){console.log(err);}
         }
     }
     onChangeHandler = (e) => {
         this.setState({ [e.target.name]: e.target.value });
     }
     managerHandler = (e, i) => {
-        const mng = this.state.rmngr;
-        var m = mng[i];
-        m[e.target.name] = e.target.value;
-        mng[i] = m;
-        this.setState({ rmngr: mng });
+        const mng = this.state.reporting_manager;
+        mng[i][e.target.name] = e.target.value;
+        this.setState({ reporting_manager: mng });
     }
     addManager = () => {
-        const mng = this.state.rmngr;
+        const mng = this.state.reporting_manager;
         mng.push({ name: '', from: '', to: '' });
-        this.setState({ rmngr: mng }, () => this.forceUpdate);
+        this.setState({ reporting_manager: mng }, () => this.forceUpdate);
     }
     removeManager = (i) => {
         var mng = []
-        this.state.rmngr.map((val, i) => mng.push(val));
+        this.state.reporting_manager.map((val, i) => mng.push(val));
         mng.splice(i, 1)
-        console.log(mng)
-        this.setState({ rmngr: mng }, () => this.forceUpdate());
+        this.setState({ reporting_manager: mng }, () => this.forceUpdate());
     }
     render() {
         if (this.added)
@@ -153,7 +115,7 @@ class AddFunc extends React.Component {
                     <div className="form">
                         <div className="form-group">
                             <label>Function Name</label>
-                            <input className="form-control" type="text" name="fname" onChange={this.onChangeHandler} value={this.state.fname}></input>
+                            <input className="form-control" type="text" name="name" onChange={this.onChangeHandler} value={this.state.name}></input>
                         </div>
                     </div>
                     <br />
@@ -170,7 +132,7 @@ class AddFunc extends React.Component {
                                     <th>TO</th>
                                     <th></th>
                                 </tr>
-                                {this.state.rmngr.map((val, index) => {
+                                {this.state.reporting_manager.map((val, index) => {
                                     return (
                                         <tr key={index}>
                                             <td>{index + 1}</td>
@@ -185,7 +147,7 @@ class AddFunc extends React.Component {
                                             <td><input className="form-control" type="date" id="date-to" value={val.to} name="to" onChange={(e) => this.managerHandler(e, index)}></input></td>
                                             <td className="check">
                                                 <input type="checkbox" name="" id="check" /><span>Till now</span>
-                                                {this.state.rmngr.length > 1 ?
+                                                {this.state.reporting_manager.length > 1 ?
                                                     <FontAwesomeIcon icon={faTrash} onClick={() => this.removeManager(index)} className="delete"></FontAwesomeIcon>
                                                     : null
                                                 }

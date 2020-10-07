@@ -4,10 +4,10 @@ class CreateMasterData < ActiveRecord::Migration[6.0]
       t.string :user
       t.string :band,array: true,default: []
       t.string :desg,array: true,default: []
-      t.string :loc,array: true,default: []
-      t.string :costCent,array: true,default: []
-      t.string :measType,array: true,default: []
-      t.string :specEmp,array: true,default: []
+      t.string :location,array: true,default: []
+      t.string :cost_center,array: true,default: []
+      t.string :measure_type,array: true,default: []
+      t.string :special_employee,array: true,default: []
 
       t.timestamps
     end

@@ -5,18 +5,15 @@ class Api::V1::FunctionsController < ApplicationController
   end
 
   def create
-    function=Function.find_by(fname:params[:fname])
+    function=Function.find_by(name:params[:name])
     if(!function)
-      function=Function.create(fname:params[:fname],rmngr:params[:rmngr])
+      function=Function.create(name:params[:name],reporting_manager:params[:reporting_manager])
     end
     if function
       render json:function
     else
       render json:function.errors
     end
-  end
-
-  def show
   end
 
   def destroy
@@ -31,9 +28,9 @@ class Api::V1::FunctionsController < ApplicationController
   end
   def update
     id=params[:id]
-    Function.where(:id=>id).update_all("fname = '"+params[:fname]+"'")
+    Function.where(:id=>id).update_all("name = '"+params[:name]+"'")
     function = Function.find_by(id:id)
-    function.rmngr=params[:rmngr]
+    function.reporting_manager=params[:reporting_manager]
     function.save()
     if function
       render json:function

@@ -1,7 +1,23 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v2 do
-      get 'objectives/index'
+      get 'emp_obj/index'
+      post 'emp_obj/empObjectives'
+      post 'emp_obj/keys'
+      post 'emp_obj/addEmpObjective'
+      post 'emp_obj/addKeys'
+
+      get 'dept_obj/index'
+      post 'dept_obj/deptObjectives'
+      post 'dept_obj/keyResults'
+      post 'dept_obj/addDeptObjective'
+      post 'dept_obj/addDeptKr_It'
+      post 'dept_obj/deleteDeptObj'
+      post 'dept_obj/deleteDeptKr_It'
+      post 'dept_obj/editDeptObj'
+      post 'dept_obj/editDeptKr_It'
+
+      post 'objectives/index'
       post 'objectives/companyObjectives'
       post 'objectives/keyResults'
       post 'objectives/addCompObjective'
@@ -9,93 +25,20 @@ Rails.application.routes.draw do
       post 'objectives/deleteCompObj'
       post 'objectives/deleteCompKr'
       post 'objectives/editCompObj'
+      post 'objectives/editCompKr'
     end
-  end
-  namespace :api do
     namespace :v1 do
-      get 'all_roles/index'
-      post 'all_roles/create'
-      post 'all_roles/update'
       get 'all_roles/allRoles'
       post 'all_roles/allPerms'
-      post 'all_roles/destroy'
-    end
-  end
-  namespace :api do
-    namespace :v1 do
-      post 'masterdata/update'
-      get 'masterdata/index'
-    end
-  end
-  namespace :api do
-    namespace :v1 do
-      get 'roles/index'
-      post 'roles/create'
-      post 'roles/update'
-      post 'roles/destroy'
-    end
-  end
-  namespace :api do
-    namespace :v1 do
-      get 'departments/index'
-      post 'departments/create'
-      post 'departments/update'
-      post 'departments/destroy'
-    end
-  end
-  namespace :api do
-    namespace :v1 do
-      get 'reviews/index'
-      post 'reviews/create'
-      post 'reviews/update'
-      post 'reviews/destroy'
-    end
-  end
-  namespace :api do
-    namespace :v1 do
-      get 'teams/index'
-      post 'teams/create'
-      post 'teams/update'
+      resources :masterdata,only: [:index,:update]
+      resources :employees,:functions,:teams,:reviews,:departments,:all_roles,only: [:index,:create,:destroy,:update]
       post 'teams/updateByEmp'
-      post 'teams/destroy'
-    end
-  end
-  namespace :api do
-    namespace :v1 do
-      get 'functions/index'
-      post 'functions/create'
-      get 'functions/show'
-      post 'functions/destroy'
-      post 'functions/update'
-    end
-  end
-  namespace :api do
-    namespace :v1 do
-      get 'employees/index'
-      post 'employees/create'
-      get 'employees/show'
-      post 'employees/destroy'
-      post 'employees/update'
       post 'employees/updatepassword'
-    end
-  end
-  namespace :api do
-    namespace :v1 do
       post 'login/index'
-      get 'login/create'
-      get 'login/show'
-      get 'login/destroy'
     end
   end
+
   root 'pages#index'
-  # namespace :api do
-  #   namespace :v1 do
-  #     get 'recipes/index'
-  #     post 'recipes/create'
-  #     get '/show/:id', to: 'recipes#show'
-  #     delete '/destroy/:id', to: 'recipes#destroy'
-  #   end
-  # end
   get '/*path' => 'pages#index'
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end

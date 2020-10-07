@@ -1,3 +1,3 @@
 class Department < ApplicationRecord
-    validates :dname, presence: true
+    validates :name, presence: true
 end

@@ -3,6 +3,7 @@ import '../../../styles/Admin/Reviews/Reviews.css';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Redirect } from 'react-router-dom';
+import { Get,Delete,Interceptor } from '../../../utils/Helper';
 
 class Reviews extends React.Component {
     review = null;
@@ -12,48 +13,27 @@ class Reviews extends React.Component {
             reviews: []
         };
     }
-    delete = (e) => {
-        const url = "/api/v1/reviews/destroy";
-        const body = { id: e }
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                console.log(response);
-                this.getData();
-            })
-            .catch(error => console.log(error.message));
+    delete =async (e) => {
+        const url = "/api/v1/reviews/"+e;
+        try{
+            const response=await Delete(url);
+            console.log(response);
+            this.getData();
+        }catch(err){console.log(response);}
     }
     componentDidMount() {
+        Interceptor();
         this.getData();
     }
-    getData=()=>{
-        const url = "/api/v1/reviews/index";
-        fetch(url)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                this.setState({ reviews: response })
+    getData = async () => {
+        const url = "/api/v1/reviews";
+        try {
+            const response = await Get(url);
+            this.setState({ reviews: response }, () => {
                 console.log(this.state.reviews);
                 this.forceUpdate();
             })
-            .catch((err) => console.log(err));
+        } catch (err) { console.log(err); }
     }
     render() {
         if (this.review != null)
@@ -79,9 +59,9 @@ class Reviews extends React.Component {
                             <div className="cover" key={index}>
                                 <div className="row reviews-content">
                                     <div className="col-1"><span className="title">{index + 1}</span></div>
-                                    <div className="col-3"><span className='title'>{review.rname}</span></div>
-                                    <div className="col-3"><span className='title'>{review.tpfrom}</span></div>
-                                    <div className="col-3"><span className='title'>{review.tpto}</span></div>
+                                    <div className="col-3"><span className='title'>{review.name}</span></div>
+                                    <div className="col-3"><span className='title'>{review.time_period_from}</span></div>
+                                    <div className="col-3"><span className='title'>{review.time_period_to}</span></div>
                                     <div className="col-1"><span className='title edit' onClick={() => {
                                         this.review = review;
                                         this.forceUpdate();
@@ -96,16 +76,6 @@ class Reviews extends React.Component {
                         <h5>No Data Found</h5>
                     </div>
                 }
-                {/* <div className="cover">
-                    <div className="row reviews-content">
-                        <div className="col-1"><span className="title">1</span></div>
-                        <div className="col-3"><span className='title'>Q1</span></div>
-                        <div className="col-3"><span className='title'>01-06-2020</span></div>
-                        <div className="col-3"><span className='title'>30-09-2020</span></div>
-                        <div className="col-1"><span className='title edit'><FontAwesomeIcon icon={faEdit}></FontAwesomeIcon></span></div>
-                        <div className="col-1"><span className='title delete'><FontAwesomeIcon icon={faTrash}></FontAwesomeIcon></span></div>
-                    </div>
-                </div> */}
                 <br />
                 {this.state.reviews.length > 0 ?
                     <div>

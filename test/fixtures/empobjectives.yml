@@ -2,8 +2,10 @@
 
 one:
   name: MyString
-  author_id: 1
+  desc: MyString
+  quadrant: MyString
 
 two:
   name: MyString
-  author_id: 1
+  desc: MyString
+  quadrant: MyString

@@ -3,6 +3,7 @@ import '../../../styles/Admin/teams/Teams.css';
 import { faEdit, faTrash, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Redirect } from 'react-router-dom';
+import {Get,Delete,Interceptor} from '../../../utils/Helper';
 
 class Teams extends React.Component {
     team = null;
@@ -13,50 +14,28 @@ class Teams extends React.Component {
         };
     }
     componentDidMount() {
+        Interceptor();
         this.getData();
     }
-    getData=()=>{
-        const url = "/api/v1/teams/index";
-        fetch(url)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
+    getData=async ()=>{
+        const url = "/api/v1/teams";
+        try{
+            const response=await Get(url);
+            this.setState({teams:response},()=>{
+                console.log(this.state.teams);
+                this.forceUpdate();
             })
-            .then(response => {
-                this.setState({ teams: response }, () => {
-                    console.log(this.state.teams);
-                    this.forceUpdate();
-                });
-            })
-            .catch((err) => console.log(err));
+        }catch(err){console.log(err);}
     }
-    delete = (e) => {
-        const url = "/api/v1/teams/destroy";
-        const body = { id: e }
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-Token": token,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => {
-                console.log(response);
-                this.getData();
-            })
-            .catch(error => console.log(error.message));
+    delete =async (e) => {
+        const url = "/api/v1/teams/"+e;
+        try{
+            const response=await Delete(url);
+            console.log(response);
+            this.getData();
+        }catch(err){console.log(err);}
     }
-    change=(e)=>{
+    convert=(e)=>{
         var name=''
         e.map((val,i)=>{
             val=JSON.parse(val)
@@ -69,7 +48,6 @@ class Teams extends React.Component {
     }
     render() {
         if (this.team != null) {
-            // return <AddEmployee employee={this.employee}></AddEmployee>
             return <Redirect to={{ pathname: '/home/team/add', state: { team: this.team } }}></Redirect>
         }
         else
@@ -107,10 +85,10 @@ class Teams extends React.Component {
                                 <div className="tcontents" key={index}>
                                     <div className="row teams-content">
                                         <div className="col-1">{index + 1}</div>
-                                        <div className="col-2">{team.tname}</div>
-                                        <div className="col-2">{team.tdept}</div>
-                                        <div className="col-3">{this.change(team.rmngr)}</div>
-                                        <div className="col-2">{team.tusers.length}</div>
+                                        <div className="col-2">{team.name}</div>
+                                        <div className="col-2">{team.dept}</div>
+                                        <div className="col-3">{this.convert(team.reporting_manager)}</div>
+                                        <div className="col-2">{team.users.length}</div>
                                         <div className="col-1 edit"><span onClick={() => {
                                             this.team = team;
                                             this.forceUpdate();

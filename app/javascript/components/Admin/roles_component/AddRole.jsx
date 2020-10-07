@@ -1,6 +1,7 @@
 import React from 'react';
 import '../../../styles/Admin/Roles/AddRole.css';
 import { Redirect } from 'react-router-dom';
+import { Get, Post, Patch, Interceptor } from '../../../utils/Helper';
 
 class AddRole extends React.Component {
     update = false;
@@ -28,7 +29,8 @@ class AddRole extends React.Component {
             roles: {}
         }
     }
-    componentDidMount() {
+    async componentDidMount() {
+        Interceptor();
         const This = this
         if (this.props.location.state) {
             this.update = true;
@@ -42,102 +44,46 @@ class AddRole extends React.Component {
             const url = "/api/v1/all_roles/allPerms";
             const { id } = this.props.location.state.role;
             const body = { id };
-            console.log(body)
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-Token": token,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error("Network response was not ok.");
-                })
-                .then(response => {
-                    this.setState({ roles: response }, () => {
-                        console.log(this.state.roles);
-                        this.forceUpdate();
-                    })
-                })
-                .catch(error => console.log(error.message));
-        }
-        if (!this.update) {
-            const url = "/api/v1/all_roles/index";
-            fetch(url)
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error("Network response was not ok.");
-                })
-                .then(response => {
-                    this.setState({ roles: response }, () => {
-                        console.log(this.state.roles);
-                        this.forceUpdate();
-                    })
-                })
-                .catch((err) => console.log(err));
-        }
-    }
-    add = (e) => {
-        e.preventDefault();
-        console.log(this.state);
-        if (this.update) {
-            const url = "/api/v1/all_roles/update";
-            const { roles, id } = this.state
-            const body = { id, roles };
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-Token": token,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error("Network response was not ok.");
-                })
-                .then(response => {
-                    console.log(response);
-                    this.added = true;
+            try {
+                const response = await Post(url, body);
+                this.setState({ roles: response }, () => {
+                    console.log(this.state.roles);
                     this.forceUpdate();
-                })
-                .catch(error => console.log(error.message));
+                });
+            } catch (err) { console.log(err); }
         }
         else {
-            const url = "/api/v1/all_roles/create";
-            const { name, roles } = this.state;
-            const body = { name, roles };
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-Token": token,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error("Network response was not ok.");
-                })
-                .then(response => {
-                    console.log(response);
-                    this.added = true;
+            const url = "/api/v1/all_roles";
+            try {
+                const response = await Get(url);
+                this.setState({ roles: response }, () => {
+                    console.log(this.state.roles);
                     this.forceUpdate();
                 })
-                .catch(error => console.log(error.message));
+            } catch (err) { console.log(err); }
+        }
+    }
+    add = async (e) => {
+        e.preventDefault();
+        const { name, roles } = this.state;
+        const body = { name, roles };
+        let url = "/api/v1/all_roles";
+        if (this.update) {
+            url += "/" + this.state.id;
+            try {
+                const response = await Patch(url, body);
+                console.log(response);
+                this.added = true;
+                this.forceUpdate();
+            } catch (err) { console.log(err); }
+        }
+        else {
+            try {
+                const response = await Post(url, body);
+                console.log(response);
+                this.added = true;
+                this.forceUpdate();
+            } catch (err) { console.log(err); }
         }
     }
     onChangeHandler = (e) => {
@@ -204,551 +150,6 @@ class AddRole extends React.Component {
                                 </div>
                             );
                         })}
-                        {/* <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">Em</span>
-                                <span className='title'>Employee</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='read' checked={this.state.permits.employee.read} onChange={(e) => this.handleChange(e, 'employee')}></input>
-                                        <span className="note ml-2">READ</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='create' checked={this.state.permits.employee.create} onChange={(e) => this.handleChange(e, 'employee')}></input>
-                                        <span className="note ml-2">CREATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='update' checked={this.state.permits.employee.update} onChange={(e) => this.handleChange(e, 'employee')}></input>
-                                        <span className="note ml-2">UPDATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='delete' checked={this.state.permits.employee.delete} onChange={(e) => this.handleChange(e, 'employee')}></input>
-                                        <span className="note ml-2">DELETE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='import' checked={this.state.permits.employee.import} onChange={(e) => this.handleChange(e, 'employee')}></input>
-                                        <span className="note ml-2">IMPORT</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='export' checked={this.state.permits.employee.export} onChange={(e) => this.handleChange(e, 'employee')}></input>
-                                        <span className="note ml-2">EXPORT</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-6 d-flex justify-content-end">
-                                <label className="switch mt-1">
-                                    <input type="checkbox" />
-                                    <span className="slider round"></span>
-                                </label>
-                                <span className="px-3 text-muted py-0">With Approval</span>
-                            </div>
-                            <div className="col-6 d-flex justify-content-start">
-                                <label className="switch mt-1">
-                                    <input type="checkbox" />
-                                    <span className="slider round"></span>
-                                </label>
-                                <span className="px-3 text-muted py-0">Without Approval</span>
-                            </div>
-                        </div>
-                        <hr className="text-muted" />
-                         <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">De</span>
-                                <span className='title'>Department</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='read' checked={this.state.permits.department.read} onChange={(e) => this.handleChange(e, 'department')}></input>
-                                        <span className="note ml-2">READ</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='create' checked={this.state.permits.department.create} onChange={(e) => this.handleChange(e, 'department')}></input>
-                                        <span className="note ml-2">CREATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='update' checked={this.state.permits.department.update} onChange={(e) => this.handleChange(e, 'department')}></input>
-                                        <span className="note ml-2">UPDATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='delete' checked={this.state.permits.department.delete} onChange={(e) => this.handleChange(e, 'department')}></input>
-                                        <span className="note ml-2">DELETE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='import' checked={this.state.permits.department.import} onChange={(e) => this.handleChange(e, 'department')}></input>
-                                        <span className="note ml-2">IMPORT</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='export' checked={this.state.permits.department.export} onChange={(e) => this.handleChange(e, 'department')}></input>
-                                        <span className="note ml-2">EXPORT</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="text-muted" />
-                        <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">Ma</span>
-                                <span className='title'>Master Data</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='read' checked={this.state.permits.masterData.read} onChange={(e) => this.handleChange(e, 'masterData')}></input>
-                                        <span className="note ml-2">READ</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='create' checked={this.state.permits.masterData.create} onChange={(e) => this.handleChange(e, 'masterData')}></input>
-                                        <span className="note ml-2">CREATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='update' checked={this.state.permits.masterData.update} onChange={(e) => this.handleChange(e, 'masterData')}></input>
-                                        <span className="note ml-2">UPDATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='delete' checked={this.state.permits.masterData.delete} onChange={(e) => this.handleChange(e, 'masterData')}></input>
-                                        <span className="note ml-2">DELETE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='import' checked={this.state.permits.masterData.import} onChange={(e) => this.handleChange(e, 'masterData')}></input>
-                                        <span className="note ml-2">IMPORT</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='export' checked={this.state.permits.masterData.export} onChange={(e) => this.handleChange(e, 'masterData')}></input>
-                                        <span className="note ml-2">EXPORT</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="text-muted" />
-                        <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">Ro</span>
-                                <span className='title'>Role</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='read' checked={this.state.permits.role.read} onChange={(e) => this.handleChange(e, 'role')}></input>
-                                        <span className="note ml-2">READ</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='create' checked={this.state.permits.role.create} onChange={(e) => this.handleChange(e, 'role')}></input>
-                                        <span className="note ml-2">CREATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='update' checked={this.state.permits.role.update} onChange={(e) => this.handleChange(e, 'role')}></input>
-                                        <span className="note ml-2">UPDATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='delete' checked={this.state.permits.role.delete} onChange={(e) => this.handleChange(e, 'role')}></input>
-                                        <span className="note ml-2">DELETE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='import' checked={this.state.permits.role.import} onChange={(e) => this.handleChange(e, 'role')}></input>
-                                        <span className="note ml-2">IMPORT</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='export' checked={this.state.permits.role.export} onChange={(e) => this.handleChange(e, 'role')}></input>
-                                        <span className="note ml-2">EXPORT</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="text-muted" />
-                        <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">Fu</span>
-                                <span className='title'>Function</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='read' checked={this.state.permits.function.read} onChange={(e) => this.handleChange(e, 'function')}></input>
-                                        <span className="note ml-2">READ</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='create' checked={this.state.permits.function.create} onChange={(e) => this.handleChange(e, 'function')}></input>
-                                        <span className="note ml-2">CREATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='update' checked={this.state.permits.function.update} onChange={(e) => this.handleChange(e, 'function')}></input>
-                                        <span className="note ml-2">UPDATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='delete' checked={this.state.permits.function.delete} onChange={(e) => this.handleChange(e, 'function')}></input>
-                                        <span className="note ml-2">DELETE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='import' checked={this.state.permits.function.import} onChange={(e) => this.handleChange(e, 'function')}></input>
-                                        <span className="note ml-2">IMPORT</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='export' checked={this.state.permits.function.export} onChange={(e) => this.handleChange(e, 'function')}></input>
-                                        <span className="note ml-2">EXPORT</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="text-muted" />
-                        <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">Co</span>
-                                <span className='title'>Company OKR</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='read' checked={this.state.permits.companyOKR.read} onChange={(e) => this.handleChange(e, 'companyOKR')}></input>
-                                        <span className="note ml-2">READ</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='create' checked={this.state.permits.companyOKR.create} onChange={(e) => this.handleChange(e, 'companyOKR')}></input>
-                                        <span className="note ml-2">CREATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='update' checked={this.state.permits.companyOKR.update} onChange={(e) => this.handleChange(e, 'companyOKR')}></input>
-                                        <span className="note ml-2">UPDATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='delete' checked={this.state.permits.companyOKR.delete} onChange={(e) => this.handleChange(e, 'companyOKR')}></input>
-                                        <span className="note ml-2">DELETE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='import' checked={this.state.permits.companyOKR.import} onChange={(e) => this.handleChange(e, 'companyOKR')}></input>
-                                        <span className="note ml-2">IMPORT</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='export' checked={this.state.permits.companyOKR.export} onChange={(e) => this.handleChange(e, 'companyOKR')}></input>
-                                        <span className="note ml-2">EXPORT</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="text-muted" />
-                        <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">De</span>
-                                <span className='title'>Department OKR</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='read' checked={this.state.permits.deptOKR.read} onChange={(e) => this.handleChange(e, 'deptOKR')}></input>
-                                        <span className="note ml-2">READ</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='create' checked={this.state.permits.deptOKR.create} onChange={(e) => this.handleChange(e, 'deptOKR')}></input>
-                                        <span className="note ml-2">CREATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='update' checked={this.state.permits.deptOKR.update} onChange={(e) => this.handleChange(e, 'deptOKR')}></input>
-                                        <span className="note ml-2">UPDATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='delete' checked={this.state.permits.deptOKR.delete} onChange={(e) => this.handleChange(e, 'deptOKR')}></input>
-                                        <span className="note ml-2">DELETE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='import' checked={this.state.permits.deptOKR.import} onChange={(e) => this.handleChange(e, 'deptOKR')}></input>
-                                        <span className="note ml-2">IMPORT</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='export' checked={this.state.permits.deptOKR.export} onChange={(e) => this.handleChange(e, 'deptOKR')}></input>
-                                        <span className="note ml-2">EXPORT</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="text-muted" />
-                        <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">Em</span>
-                                <span className='title'>Employee OKR</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='read' checked={this.state.permits.empOKR.read} onChange={(e) => this.handleChange(e, 'empOKR')}></input>
-                                        <span className="note ml-2">READ</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='create' checked={this.state.permits.empOKR.create} onChange={(e) => this.handleChange(e, 'empOKR')}></input>
-                                        <span className="note ml-2">CREATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='update' checked={this.state.permits.empOKR.update} onChange={(e) => this.handleChange(e, 'empOKR')}></input>
-                                        <span className="note ml-2">UPDATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='delete' checked={this.state.permits.empOKR.delete} onChange={(e) => this.handleChange(e, 'empOKR')}></input>
-                                        <span className="note ml-2">DELETE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='import' checked={this.state.permits.empOKR.import} onChange={(e) => this.handleChange(e, 'empOKR')}></input>
-                                        <span className="note ml-2">IMPORT</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='export' checked={this.state.permits.empOKR.export} onChange={(e) => this.handleChange(e, 'empOKR')}></input>
-                                        <span className="note ml-2">EXPORT</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="text-muted" />
-                        <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">Te</span>
-                                <span className='title'>Team OKR</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='read' checked={this.state.permits.teamOKR.read} onChange={(e) => this.handleChange(e, 'teamOKR')}></input>
-                                        <span className="note ml-2">READ</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='create' checked={this.state.permits.teamOKR.create} onChange={(e) => this.handleChange(e, 'teamOKR')}></input>
-                                        <span className="note ml-2">CREATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='update' checked={this.state.permits.teamOKR.update} onChange={(e) => this.handleChange(e, 'teamOKR')}></input>
-                                        <span className="note ml-2">UPDATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='delete' checked={this.state.permits.teamOKR.delete} onChange={(e) => this.handleChange(e, 'teamOKR')}></input>
-                                        <span className="note ml-2">DELETE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='import' checked={this.state.permits.teamOKR.import} onChange={(e) => this.handleChange(e, 'teamOKR')}></input>
-                                        <span className="note ml-2">IMPORT</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='export' checked={this.state.permits.teamOKR.export} onChange={(e) => this.handleChange(e, 'teamOKR')}></input>
-                                        <span className="note ml-2">EXPORT</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="text-muted" />
-                        <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">Te</span>
-                                <span className='title'>Team</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='read' checked={this.state.permits.team.read} onChange={(e) => this.handleChange(e, 'team')}></input>
-                                        <span className="note ml-2">READ</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='create' checked={this.state.permits.team.create} onChange={(e) => this.handleChange(e, 'team')}></input>
-                                        <span className="note ml-2">CREATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='update' checked={this.state.permits.team.update} onChange={(e) => this.handleChange(e, 'team')}></input>
-                                        <span className="note ml-2">UPDATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='delete' checked={this.state.permits.team.delete} onChange={(e) => this.handleChange(e, 'team')}></input>
-                                        <span className="note ml-2">DELETE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='import' checked={this.state.permits.team.import} onChange={(e) => this.handleChange(e, 'team')}></input>
-                                        <span className="note ml-2">IMPORT</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='export' checked={this.state.permits.team.export} onChange={(e) => this.handleChange(e, 'team')}></input>
-                                        <span className="note ml-2">EXPORT</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="text-muted" />
-                        <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">We</span>
-                                <span className='title'>Weekly Plan</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='read' checked={this.state.permits.weeklyPlan.read} onChange={(e) => this.handleChange(e, 'weeklyPlan')}></input>
-                                        <span className="note ml-2">READ</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='create' checked={this.state.permits.weeklyPlan.create} onChange={(e) => this.handleChange(e, 'weeklyPlan')}></input>
-                                        <span className="note ml-2">CREATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='update' checked={this.state.permits.weeklyPlan.update} onChange={(e) => this.handleChange(e, 'weeklyPlan')}></input>
-                                        <span className="note ml-2">UPDATE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='delete' checked={this.state.permits.weeklyPlan.delete} onChange={(e) => this.handleChange(e, 'weeklyPlan')}></input>
-                                        <span className="note ml-2">DELETE</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='import' checked={this.state.permits.weeklyPlan.import} onChange={(e) => this.handleChange(e, 'weeklyPlan')}></input>
-                                        <span className="note ml-2">IMPORT</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='export' checked={this.state.permits.weeklyPlan.export} onChange={(e) => this.handleChange(e, 'weeklyPlan')}></input>
-                                        <span className="note ml-2">EXPORT</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="text-muted" />
-                        <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">Pm</span>
-                                <span className='title'>PMS</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='hr' checked={this.state.permits.pms.hr} onChange={(e) => this.handleChange(e, 'pms')}></input>
-                                        <span className="note ml-2">HR</span>
-                                    </div>
-                                </div>
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='admin' checked={this.state.permits.pms.admin} onChange={(e) => this.handleChange(e, 'pms')}></input>
-                                        <span className="note ml-2">ADMIN</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="text-muted" />
-                        <div className="row perm">
-                            <div className="col col-3">
-                                <span className="logo">Re</span>
-                                <span className='title'>Reset Password</span>
-                            </div>
-                            <div className="col-9 d-flex">
-                                <div className="col-2">
-                                    <div className="form-group d-flex align-items-center">
-                                        <input type="checkbox" value='reset' checked={this.state.permits.resetPass.reset} onChange={(e) => this.handleChange(e, 'resetPass')}></input>
-                                        <span className="note ml-2">RESET</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr className="text-muted" /> */}
                     </div>
                     <div className="footer">
                         <button className="save" onClick={this.add}>Save</button>

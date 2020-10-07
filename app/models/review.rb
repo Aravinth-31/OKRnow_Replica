@@ -1,5 +1,5 @@
 class Review < ApplicationRecord
-    validates :rname, presence: true
-    validates :tpfrom, presence: true
-    validates :tpto, presence: true
+    validates :name, presence: true
+    validates :time_period_from, presence: true
+    validates :time_period_to, presence: true
 end
