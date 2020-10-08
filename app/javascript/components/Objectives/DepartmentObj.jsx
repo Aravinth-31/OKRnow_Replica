@@ -1,12 +1,12 @@
 import React from 'react';
 import '../../styles/Objectives/CompanyObj.css';
 import Select from 'react-select'
-import { faPlusCircle, faCommentAlt, faEllipsisV } from '@fortawesome/free-solid-svg-icons'
+import { faPlusCircle, faCommentAlt, faEllipsisV, faLink } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import $ from 'jquery';
-import { Post, onChangeHandler, Interceptor } from '../../utils/Helper';
+import { Post, onChangeHandler, Interceptor, Get } from '../../utils/Helper';
 
 class DepartmentObj extends React.Component {
     optionQty = [
@@ -27,6 +27,7 @@ class DepartmentObj extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            companyObjectives: [],
             objectives: [],
             keyresults: [],
             newObjName: '',
@@ -44,6 +45,7 @@ class DepartmentObj extends React.Component {
     componentDidMount() {
         Interceptor();
         this.getObjectives();
+        this.getCompanyObejctives();
         const This = this;
         $('#addObjBtn').click(function () {
             $('.AddObj').addClass('show');
@@ -79,20 +81,31 @@ class DepartmentObj extends React.Component {
             $('.editKr').removeClass('show');
         })
     }
-    getObjectives = () => {
+    getObjectives = async () => {
         const url = "/api/v2/dept_obj/deptObjectives";
         const body = { quadrant: this.quadrant }
-        Post(url, body)
-            .then(response => {
-                if (response.length > 0 && this.id == 0)
-                    this.id = response[0].id
-                this.setState({ objectives: response }, () => {
-                    console.log(this.state.objectives);
-                    this.forceUpdate();
-                })
-                this.getKeyresults();
+        try {
+            const response = await Post(url, body);
+            if (response.length > 0 && this.id == 0)
+                this.id = response[0].id
+            this.setState({ objectives: response }, () => {
+                console.log(this.state.objectives);
+                this.forceUpdate();
             })
-            .catch((err) => console.log(err));
+            this.getKeyresults();
+        } catch (err) { console.log(err); }
+    }
+    getCompanyObejctives = async () => {
+        const url = "/api/v2/objectives/companyObjectives";
+        const body = {};
+        try {
+            const response = await Post(url, body);
+            this.setState({ companyObjectives: response }, () => {
+                console.log(this.state.companyObjectives);
+                this.forceUpdate();
+            })
+        } catch (err) { console.log(err); }
+
     }
     getKeyresults = () => {
         const url = "/api/v2/dept_obj/keyResults";
@@ -173,6 +186,16 @@ class DepartmentObj extends React.Component {
                 this.getObjectives();
             }).catch(err => console.log(err));
     }
+    linkToCompany = async (companyId, departmentId) => {
+        console.log(companyId, departmentId);
+        const body = { companyId, departmentId };
+        const url = "/api/v2/dept_obj/linkToCompany";
+        try {
+            const response = await Post(url, body);
+            console.log(response);
+            this.props.history.push('/home/objectives/company');
+        } catch (err) { console.log(err); }
+    }
     render() {
         return (
             <div className="DepartmentObj Obj">
@@ -205,7 +228,7 @@ class DepartmentObj extends React.Component {
                             return (
                                 <div className='obj' key={index} onClick={() => this.changeObj(obj.id)}>
                                     <div className='row'>
-                                        <div className='col-7 cont'>
+                                        <div className='col-6 cont'>
                                             <span className='logo'>OB</span>
                                             <span className='title pl-4'>{obj.name}</span>
                                         </div>
@@ -218,6 +241,19 @@ class DepartmentObj extends React.Component {
                                                     rotation: 0.25, textSize: '25px', pathTransitionDuration: 0.5, pathColor: `#ff8095`, textColor: '#f88', trailColor: '#d6d6d6',
                                                 })}
                                             />
+                                        </div>
+                                        <div className='col-1 d-flex align-items-center justify-content-center'>
+                                            <div className="btn-group">
+                                                <p data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" className="dropdown-butn"><FontAwesomeIcon icon={faLink} /></p>
+                                                <div className="dropdown-menu">
+                                                    {this.state.companyObjectives.length > 0 ?
+                                                        this.state.companyObjectives.map((val, index) => {
+                                                            return <button key={index} className="dropdown-item" type="button" onClick={() => this.linkToCompany(val.id, obj.id)}>{val.name}</button>
+                                                        }) :
+                                                        <button className="dropdown-item" type="button" disabled>No Objectives Found</button>
+                                                    }
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className='col-1 d-flex align-items-center justify-content-center'>
                                             <div className="btn-group">
@@ -266,7 +302,7 @@ class DepartmentObj extends React.Component {
                                                     <p data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" className="dropdown-butn"><FontAwesomeIcon icon={faEllipsisV} /></p>
                                                     <div className="dropdown-menu">
                                                         <button className="dropdown-item" type="button" onClick={() => {
-                                                            this.setState({ editKrid: key.id, editKrname: key.name ,iskey:key.iskey}, () => $('.editKr').addClass('show'));
+                                                            this.setState({ editKrid: key.id, editKrname: key.name, iskey: key.iskey }, () => $('.editKr').addClass('show'));
                                                         }}>Edit KR</button>
                                                         <button className="dropdown-item" type="button">Set Due Date</button>
                                                         <button className="dropdown-item" type="button">Change Quarter</button>
@@ -375,7 +411,7 @@ class DepartmentObj extends React.Component {
                     <div className='form'>
                         <div className='close btn px-0 mx-0'>X</div>
                         <br />
-                        <h5>Edit {this.state.iskey?"Key Result":"Initiative"}</h5>
+                        <h5>Edit {this.state.iskey ? "Key Result" : "Initiative"}</h5>
                         <ul className='navig'>
                             <li name='li1' className='active'>Name</li>
                             <li name='li2'>Metrices</li>
@@ -384,13 +420,13 @@ class DepartmentObj extends React.Component {
                         <div className='content'>
                             <div className='li1 div show'>
                                 <div>
-                                    <label className='label'>Edit Name For {this.state.iskey?"Key Result":"Initiative"}</label>
+                                    <label className='label'>Edit Name For {this.state.iskey ? "Key Result" : "Initiative"}</label>
                                     <input className='form-control' name='editKrname' value={this.state.editKrname} onChange={(e) => onChangeHandler(e, this)}></input>
                                 </div>
                             </div>
                             <div className='li2 div'>
                                 <div>
-                                    <label className='label'>Edit Metrices For {this.state.iskey?"Key Result":"Initiative"}</label><br />
+                                    <label className='label'>Edit Metrices For {this.state.iskey ? "Key Result" : "Initiative"}</label><br />
                                     <label className='label'>Measure Type</label>
                                     <select className='form-control p-0' name='editKrpercent' value={this.state.editKrpercent} onChange={(e) => onChangeHandler(e, this)}>
                                         <option value="%">%</option>
@@ -404,7 +440,7 @@ class DepartmentObj extends React.Component {
                             </div>
                             <div className='li3 div'>
                                 <div>
-                                    <label className='label'>Edit Due Date For {this.state.iskey?"Key Result":"Initiative"}</label>
+                                    <label className='label'>Edit Due Date For {this.state.iskey ? "Key Result" : "Initiative"}</label>
                                     <input className='form-control' type='date' name='editKrdue' value={this.state.editKrdue} onChange={(e) => onChangeHandler(e, this)}></input>
                                 </div>
                             </div>

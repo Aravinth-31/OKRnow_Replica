@@ -48,6 +48,7 @@ class Api::V1::AllRolesController < ApplicationController
     render json:{:result=>'Created'}
   end
   def update
+    RoleName.where(:id=>params[:id]).update_all("name='"+params[:name]+"'")
     for i in params[:roles]
       for j in i[1]
         if j[1][:have]

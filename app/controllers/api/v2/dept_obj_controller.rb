@@ -26,6 +26,14 @@ class Api::V2::DeptObjController < ApplicationController
     puts params[:id]
     render json: keyresults
   end
+  def linkToCompany
+    objective=Deptobjective.where(id:params[:departmentId].to_s).update_all("companyobjective_id='"+params[:companyId].to_s+"'")
+    if objective
+      render json:objective
+    else
+      render json:objective.errors
+    end
+  end
   def addDeptObjective
     objective=Deptobjective.create(name:params[:name],quadrant:params[:quadrant],desc:params[:desc])
     if(objective)

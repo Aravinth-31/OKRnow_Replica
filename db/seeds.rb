@@ -11,4 +11,5 @@ MasterDatum.create(user:'master');
 #     AllRole.create(section:'Reset Password',permit:i)
 # end
 # Companyobjective.create([{name:'Obj1',desc:'this is objective 1',quadrant:'Q1'},{name:'Obj2',desc:'this is objective 2',quadrant:'Q1'}])
-# Companykeyresult.create([{name:'key1',desc:'this is key result 1',companyobjective_id:1},{name:'key2',desc:'this is key result 2',companyobjective_id:1}])
+# Companykeyresult.create([{name:'key1',desc:'this is key result 1',companyobjective_id:9,percent:66},{name:'key2',desc:'this is key result 2',companyobjective_id:9,percent:88}])
+Deptobjective.create({name:'Obj1',desc:'This is obj1',companyobjective_id:9})

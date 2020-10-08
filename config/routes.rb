@@ -10,14 +10,15 @@ Rails.application.routes.draw do
       get 'dept_obj/index'
       post 'dept_obj/deptObjectives'
       post 'dept_obj/keyResults'
+      post 'dept_obj/linkToCompany'
       post 'dept_obj/addDeptObjective'
       post 'dept_obj/addDeptKr_It'
       post 'dept_obj/deleteDeptObj'
       post 'dept_obj/deleteDeptKr_It'
       post 'dept_obj/editDeptObj'
       post 'dept_obj/editDeptKr_It'
-
-      post 'objectives/index'
+      
+      delete 'objectives/index'
       post 'objectives/companyObjectives'
       post 'objectives/keyResults'
       post 'objectives/addCompObjective'

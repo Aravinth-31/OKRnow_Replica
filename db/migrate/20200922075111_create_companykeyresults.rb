@@ -7,6 +7,7 @@ class CreateCompanykeyresults < ActiveRecord::Migration[6.0]
       t.text :desc
       t.string :due_date,default:''
       t.string :measure_type,default:'%'
+      t.boolean :iskey,default:true
 
       t.timestamps
     end

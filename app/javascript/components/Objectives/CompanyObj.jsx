@@ -7,6 +7,7 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import $ from 'jquery';
 import { passCsrfToken, csrfToken, Post, onChangeHandler, Interceptor } from '../../utils/Helper';
+import axios from 'axios';
 
 class CompanyObj extends React.Component {
     optionM = [
@@ -34,7 +35,8 @@ class CompanyObj extends React.Component {
             editKrname: '',
             editKrid: 0,
             editKrpercent: '%',
-            editKrdue: ''
+            editKrdue: '',
+            iskey:false
         }
     }
     componentDidMount() {
@@ -120,13 +122,13 @@ class CompanyObj extends React.Component {
         } catch (err) { console.log(err); }
 
     }
-    delete = async (id, opt) => {
+    delete = async (id, opt,iskey=false) => {
         let url = '';
         if (opt === 'obj')
             url = '/api/v2/objectives/deleteCompObj';
         else
             url = '/api/v2/objectives/deleteCompKr';
-        const body = { id };
+        const body = { id ,iskey};
         try {
             const response = await Post(url, body)
             console.log(response);
@@ -144,7 +146,7 @@ class CompanyObj extends React.Component {
         }
         else {
             url = '/api/v2/objectives/editCompKr';
-            body = { id: this.state.editKrid, name: this.state.editKrname, percent: this.state.editKrpercent, due: this.state.editKrdue };
+            body = { id: this.state.editKrid, name: this.state.editKrname, percent: this.state.editKrpercent, due: this.state.editKrdue ,iskey:this.state.iskey};
         }
         try {
             const response = await Post(url, body)
@@ -245,13 +247,13 @@ class CompanyObj extends React.Component {
                                                     <p data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" className="dropdown-butn"><FontAwesomeIcon icon={faEllipsisV} /></p>
                                                     <div className="dropdown-menu">
                                                         <button className="dropdown-item" type="button" onClick={() => {
-                                                            this.setState({ editKrid: key.id, editKrname: key.name }, () => $('.editKr').addClass('show'));
+                                                            this.setState({ editKrid: key.id, editKrname: key.name ,iskey:key.iskey}, () => $('.editKr').addClass('show'));
                                                         }}>Edit KR</button>
                                                         <button className="dropdown-item" type="button">Set Due Date</button>
                                                         <button className="dropdown-item" type="button">Change Quarter</button>
                                                         <button className="dropdown-item" type="button">Set High Priority</button>
                                                         <button className="dropdown-item" type="button">Send For Approval</button>
-                                                        <button className="dropdown-item" type="button" onClick={() => this.delete(key.id, 'key')}>Delete</button>
+                                                        <button className="dropdown-item" type="button" onClick={() => this.delete(key.id, 'key',key.iskey)}>Delete</button>
                                                     </div>
                                                 </div>
                                             </div>
